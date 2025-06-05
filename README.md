@@ -12,7 +12,12 @@
     cd world-app
     ```
 
-3. Starte die Web-App (der build-Prozess kann etwas dauern).
+3. Führe folgenden Befehl aus.
+    ```bash
+    npm install
+    ```
+
+4. Starte die Web-App (der build-Prozess kann etwas dauern).
     ```bash
     npm start
     ```
@@ -23,4 +28,4 @@
     ng serve
     ```
 
-4. Öffne den Link aus dem Terminal im Browser.
+5. Öffne den Link aus dem Terminal im Browser.
