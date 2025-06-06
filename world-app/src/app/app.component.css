@@ -6,13 +6,15 @@
 
 .navbar {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 0.5rem;
+  left: 1rem;
+  right: 1rem;
   display: flex;
   justify-content: space-evenly;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(245, 245, 245, 0.9);
   padding: 0.5rem 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 }
 
@@ -22,6 +24,13 @@
   flex: 1;
   text-align: center;
   padding: 0.5rem;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+
+.navbar a:hover {
+  transform: scale(1.05);
 }
 
 @media (max-width: 600px) {
