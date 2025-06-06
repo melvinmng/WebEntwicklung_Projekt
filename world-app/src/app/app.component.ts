@@ -7,7 +7,15 @@ const countries: FeatureCollection = countriesData as FeatureCollection;
 
 @Component({
   selector: 'app-root',
-  template: `<div id="map"></div>`,
+  template: `
+    <nav class="navbar">
+      <a href="#">Placeholder 1</a>
+      <a href="#">Placeholder 2</a>
+      <a href="#">Placeholder 3</a>
+      <a href="#">Placeholder 4</a>
+    </nav>
+    <div id="map"></div>
+  `,
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
