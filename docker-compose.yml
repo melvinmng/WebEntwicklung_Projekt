@@ -3,19 +3,19 @@ version: "3.8"
 services:
   api-service:
     build:
-      context: ./api-service
+      context: travel_agent/backend/api-service
     ports:
       - "5001:5000"
 
   auth-service:
     build:
-      context: ./auth-service
+      context: travel_agent/backend/auth-service
     ports:
       - "5002:5002"
 
   frontend:
     build:
-      context: ./world-app
+      context: ./travel_agent
     ports:
       - "4200:80"
     depends_on:
