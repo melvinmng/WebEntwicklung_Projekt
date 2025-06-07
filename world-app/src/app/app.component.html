@@ -29,8 +29,10 @@
 
     <select (change)="flyToLocation($event)">
       <option disabled selected>Ort auswählen...</option>
-      <option *ngFor="let loc of selectedLocations; let i = index" [value]="i">
-        {{ loc.city }}, {{ loc.country }}
+      <option 
+        *ngFor="let loc of getAllDropdownLocations(); let i = index" 
+        [value]="i">
+        {{ loc.label }}
       </option>
     </select>
 
@@ -47,18 +49,42 @@
 <div id="map"></div>
 
 
-<!-- Legende -->
-<div class="legend-toggle" (click)="toggleLegend()">
-  ℹ️ Legende
-</div>
+<!-- Legenden-Toggle-Button -->
+<div class="legend-toggle" (click)="toggleLegend()">Legende</div>
 
+<!-- Legenden-Box -->
 <div class="legend-box" [class.visible]="legendVisible">
-  <h4>Legende</h4>
+  <h4>Marker anzeigen:</h4>
   <ul>
-    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" width="15"> Eigene Orte</li>
-    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png" width="15"> Safe Guess</li>
-    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="15"> Experimentell</li>
-    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="15"> Geheimtipp</li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.safe" (change)="toggleMarkerVisibility('safe')" />
+        🟡 Safe
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.experimental" (change)="toggleMarkerVisibility('experimental')" />
+        🔵 Experimental
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.hidden" (change)="toggleMarkerVisibility('hidden')" />
+        🟢 Geheimtipp
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.wishlist" (change)="toggleMarkerVisibility('wishlist')" />
+        🟣 Wunschliste
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.user" (change)="toggleMarkerVisibility('user')" />
+        🔴 Besucht
+      </label>
+    </li>
   </ul>
 </div>
-

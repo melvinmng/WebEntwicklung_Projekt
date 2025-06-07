@@ -32,9 +32,10 @@ def recommendations():
     "Empfehle ihm basierend darauf **drei weitere Städte**, die ihm gefallen könnten. "
     "Gib **nur** den Namen der Stadt und das zugehörige Land aus – ohne weitere Informationen oder Erklärungen. "
     "Strukturiere deine Antwort exakt wie folgt:\n\n"
-    "1. safe: <Stadt>, <Land>\n"
-    "2. experimental: <Stadt>, <Land>\n"
-    "3. hidden: <Stadt>, <Land>"
+    "1. safe: <Stadt>, <Land>     → Eine sichere Empfehlung, stilistisch und kulturell ähnlich zu den bisherigen Reisezielen\n"
+    "2. experimental: <Stadt>, <Land>     → Eine Stadt in einer Region, die der Benutzer bisher wenig oder gar nicht bereist hat – ein kultureller oder geographischer Tapetenwechsel\n"
+    "3. hidden: <Stadt>, <Land>     → Ein echter Geheimtipp – weniger bekannt, aber lohnenswert, ein Ort abseits der Touristenpfade\n\n"
+    "Gib die Ausgabe exakt in diesem Format aus:"
     )
 
     response = model.generate_content(prompt)

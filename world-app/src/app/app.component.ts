@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common'; 
 import * as L from 'leaflet';
 import countriesData from './data/countries.geo.json';
@@ -6,7 +6,10 @@ import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+
 const countries: FeatureCollection = countriesData as FeatureCollection;
+
+type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 
 @Component({
   selector: 'app-root',
@@ -15,23 +18,29 @@ const countries: FeatureCollection = countriesData as FeatureCollection;
   styleUrls: ['./app.component.css'],
   imports: [CommonModule, HttpClientModule, FormsModule],
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent implements AfterViewInit, OnInit {
   private map!: L.Map;
   private countries = countries;
   public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   public recommendations: string = '';
 
-  private activeMarkers: { marker: L.Marker, type: 'user' | 'safe' | 'experimental' | 'hidden' }[] = [];
-  private recommendationMarkers: L.Marker[] = [];
-  private removedMarkersStack: { lat: number, lon: number, type: 'user' | 'safe' | 'experimental' | 'hidden', data: any }[] = [];
+  private allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
+  private removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
+
+  public markerVisibility: Record<MarkerType, boolean> = {
+    user: true,
+    safe: true,
+    experimental: true,
+    hidden: true,
+    wishlist: true
+  };
 
   constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
     this.initMap();
-
     const mapContainer = document.querySelector('.leaflet-top.leaflet-left');
     if (mapContainer) {
       const controlGroup = document.createElement('div');
@@ -72,8 +81,8 @@ export class AppComponent implements AfterViewInit {
       minZoom: 2,
       maxZoom: 18,
       maxBounds: [
-        [-85, -180],  // Südwest-Ecke (fast Antarktis)
-        [85, 180]     // Nordost-Ecke (fast Nordpol)
+        [-85, -180],
+        [85, 180]
       ],
       maxBoundsViscosity: 1.0
     });
@@ -93,83 +102,16 @@ export class AppComponent implements AfterViewInit {
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       const target = e.originalEvent.target as HTMLElement;
       if (target.closest('.leaflet-custom-button')) return;
-
       const lat = e.latlng.lat;
       const lon = e.latlng.lng;
-      this.addUserMarker(lat, lon);
+      this.addMarker(lat, lon, 'user');
       this.getLocationDetails(lat, lon);
     });
-  }
 
-  private getMarkerIconByType(type: 'user' | 'safe' | 'experimental' | 'hidden') {
-    const urlMap = {
-      user: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-      safe: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
-      experimental: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-      hidden: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-    };
-
-    return L.icon({
-      iconUrl: urlMap[type],
-      iconSize: [30, 50],
-      iconAnchor: [15, 50],
-      popupAnchor: [0, -50],
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      shadowSize: [40, 50],
-    });
-  }
-
-  private addUserMarker(lat: number, lon: number): void {
-    const marker = L.marker([lat, lon], {
-      icon: this.getMarkerIconByType('user'),
-      interactive: true
-    }).addTo(this.map);
-
-    marker.on('click', () => {
-      this.map.removeLayer(marker);
-      this.removedMarkersStack.push({ lat, lon, type: 'user', data: null });
-      this.activeMarkers = this.activeMarkers.filter(m => m.marker !== marker);
-    });
-
-    this.activeMarkers.push({ marker, type: 'user' });
-  }
-
-  private addRecommendationMarker(lat: number, lon: number, city: string, country: string, type: 'safe' | 'experimental' | 'hidden'): void {
-    const marker = L.marker([lat, lon], {
-      icon: this.getMarkerIconByType(type),
-      interactive: true
-    }).addTo(this.map).bindPopup(`${type}: ${city}, ${country}`);
-
-    marker.on('click', () => {
-      this.map.removeLayer(marker);
-      this.removedMarkersStack.push({ lat, lon, type, data: { city, country } });
-      this.activeMarkers = this.activeMarkers.filter(m => m.marker !== marker);
-    });
-
-    this.activeMarkers.push({ marker, type });
-  }
-
-
-  searchQuery: string = '';
-
-  searchAndAddMarker(): void {
-    if (!this.searchQuery) return;
-
-    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
-
-    this.http.get<any[]>(url).subscribe(results => {
-      if (results.length === 0) {
-        alert("Ort nicht gefunden.");
-        return;
-      }
-
-      const { lat, lon } = results[0];
-      const latNum = parseFloat(lat);
-      const lonNum = parseFloat(lon);
-
-      this.addUserMarker(latNum, lonNum);
-      this.getLocationDetails(latNum, lonNum);
-      this.map.setView([latNum, lonNum], 10);
+    this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      this.getWishlistLocationDetails(lat, lon);
     });
   }
 
@@ -178,84 +120,111 @@ export class AppComponent implements AfterViewInit {
     this.http.get<any>(url).subscribe(data => {
       const city = data.city || 'Unbekannt';
       const country = data.country || 'Unbekannt';
-
       const existing = this.selectedLocations.find(loc => loc.lat === lat && loc.lon === lon);
-      if (existing) {
-        this.selectedLocations = this.selectedLocations.filter(loc => loc !== existing);
-      } else {
+      if (!existing) {
         this.selectedLocations.push({ city, country, lat, lon });
       }
     });
   }
 
+  private getWishlistLocationDetails(lat: number, lon: number): void {
+    const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
+    this.http.get<any>(url).subscribe(() => {
+      this.http.get<any>(url).subscribe(data => {
+        const city = data.city || 'Unbekannt';
+        const country = data.country || 'Unbekannt';
+        this.addMarker(lat, lon, 'wishlist', city, country);
+      });
+    });
+  }
+
+  private getIcon(type: MarkerType): L.Icon {
+    const colors: Record<MarkerType, string> = {
+      user: 'red',
+      safe: 'yellow',
+      experimental: 'blue',
+      hidden: 'green',
+      wishlist: 'violet'
+    };
+
+    return L.icon({
+      iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colors[type]}.png`,
+      iconSize: [30, 50],
+      iconAnchor: [15, 50],
+      popupAnchor: [0, -50],
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      shadowSize: [40, 50]
+    });
+  }
+
+  private addMarker(lat: number, lon: number, type: MarkerType, city: string = '', country: string = ''): void {
+    const marker = L.marker([lat, lon], {
+      icon: this.getIcon(type),
+      interactive: true
+    }).addTo(this.map);
+
+    if (city && country) marker.bindPopup(`${type}: ${city}, ${country}`);
+
+    marker.on('click', () => {
+      this.map.removeLayer(marker);
+      this.removedMarkersStack.push({ lat, lon, type, data: { city, country } });
+      this.allMarkers = this.allMarkers.filter(m => m.marker !== marker);
+    });
+
+    this.allMarkers.push({ marker, type });
+  }
+
   generateRecommendations(): void {
     if (this.selectedLocations.length === 0) return;
-  
     this.isLoading = true;
-    this.recommendations = '';
-    this.dropdownOpen = false;
     this.recommendationsList = [];
-  
-    const locationsParam = this.selectedLocations
-      .map(loc => `${loc.city}, ${loc.country}`)
-      .join(',');
-  
+    this.dropdownOpen = false;
+
+    const locationsParam = this.selectedLocations.map(loc => `${loc.city}, ${loc.country}`).join(',');
     const url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
-  
+
     this.http.get<any>(url).subscribe(response => {
-      const recommendations = response.recommendations;
-  
-      if (!recommendations || recommendations.length === 0) {
-        this.recommendations = 'Keine Empfehlungen erhalten.';
+      const recs = response.recommendations;
+      if (!recs || recs.length === 0) {
         this.isLoading = false;
         return;
       }
-  
-      this.recommendations = recommendations.map((r: any) =>
-        `${r.type}: ${r.city}, ${r.country}`
-      ).join('\n');
-  
-      // alte Empfehlungsmarker entfernen
-      this.activeMarkers = this.activeMarkers.filter(m => {
+
+      this.allMarkers = this.allMarkers.filter(m => {
         if (['safe', 'experimental', 'hidden'].includes(m.type)) {
           this.map.removeLayer(m.marker);
           return false;
         }
         return true;
       });
-  
-      for (const rec of recommendations) {
+
+      for (const rec of recs) {
         if (rec.lat && rec.lon) {
-          const type =
-            rec.type.toLowerCase().includes('safe') ? 'safe' :
-            rec.type.toLowerCase().includes('experiment') ? 'experimental' : 'hidden';
-  
-          this.addRecommendationMarker(rec.lat, rec.lon, rec.city, rec.country, type);
+          const type = rec.type.includes('safe') ? 'safe' : rec.type.includes('experiment') ? 'experimental' : 'hidden';
+          this.addMarker(rec.lat, rec.lon, type, rec.city, rec.country);
         }
       }
-  
-      // Empfehlungen für Dropdown speichern & Dropdown öffnen
-      this.recommendationsList = recommendations;
+
+      this.recommendationsList = recs;
       this.dropdownOpen = true;
       this.isLoading = false;
-    }, error => {
-      console.error('Fehler beim Abrufen:', error);
-      this.recommendations = 'Fehler beim Abrufen der Empfehlungen.';
-      this.isLoading = false;
+    });
+  }
+
+  toggleMarkerVisibility(type: MarkerType): void {
+    this.markerVisibility[type] = !this.markerVisibility[type];
+    this.allMarkers.forEach(({ marker, type: t }) => {
+      if (t === type) {
+        this.markerVisibility[t] ? marker.addTo(this.map) : this.map.removeLayer(marker);
+      }
     });
   }
 
   restoreLastMarker(): void {
     const last = this.removedMarkersStack.pop();
     if (!last) return;
-
     const { lat, lon, type, data } = last;
-
-    if (type === 'user') {
-      this.addUserMarker(lat, lon);
-    } else {
-      this.addRecommendationMarker(lat, lon, data?.city || 'Unbekannt', data?.country || 'Unbekannt', type);
-    }
+    this.addMarker(lat, lon, type, data?.city, data?.country);
   }
 
   goHome(): void {
@@ -264,48 +233,40 @@ export class AppComponent implements AfterViewInit {
 
   clearLocations(): void {
     this.selectedLocations = [];
-    this.activeMarkers.forEach(m => this.map.removeLayer(m.marker));
-    this.activeMarkers = [];
+    this.allMarkers.forEach(m => this.map.removeLayer(m.marker));
+    this.allMarkers = [];
     this.removedMarkersStack = [];
     this.recommendations = '';
   }
 
-  public dropdownOpen: boolean = false;
-
-  public recommendationsList: {
-    city: string;
-    country: string;
-    lat: number;
-    lon: number;
-    type: string;
-  }[] = [];
-
-  
-
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-  
-  flyToRecommendation(rec: { lat: number; lon: number }): void {
-    this.map.setView([rec.lat, rec.lon], 10);
-    this.dropdownOpen = false;
+  searchQuery: string = '';
+  searchAndAddMarker(): void {
+    if (!this.searchQuery) return;
+    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
+    this.http.get<any[]>(url).subscribe(results => {
+      if (results.length === 0) {
+        alert("Ort nicht gefunden.");
+        return;
+      }
+      const { lat, lon } = results[0];
+      this.addMarker(lat, lon, 'user');
+      this.getLocationDetails(lat, lon);
+      this.map.setView([lat, lon], 10);
+    });
   }
 
-  flyToLocation(event: any): void {
-    const index = event.target.value;
-    const loc = this.selectedLocations[index];
-    if (loc) this.map.setView([loc.lat, loc.lon], 10);
+  ngOnInit(): void {
+    document.addEventListener('click', () => {
+      this.dropdownOpen = false;
+    });
   }
 
   navbarVisible = true;
   private navbarFadeTimeout: any = null;
-
   showNavbar(): void {
     this.navbarVisible = true;
     clearTimeout(this.navbarFadeTimeout);
   }
-
   startNavbarFadeTimer(): void {
     clearTimeout(this.navbarFadeTimeout);
     this.navbarFadeTimeout = setTimeout(() => {
@@ -314,16 +275,56 @@ export class AppComponent implements AfterViewInit {
   }
 
   legendVisible = false;
-
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
   }
 
-  ngOnInit(): void {
-    document.addEventListener('click', () => {
-      this.dropdownOpen = false;
-    });
+  dropdownOpen: boolean = false;
+  recommendationsList: {
+    city: string;
+    country: string;
+    lat: number;
+    lon: number;
+    type: string;
+  }[] = [];
+
+  flyToRecommendation(rec: { lat: number; lon: number }): void {
+    this.map.setView([rec.lat, rec.lon], 10);
+    this.dropdownOpen = false;
   }
+  flyToLocation(event: any): void {
+    const index = event.target.value;
+    const allLocations = this.getAllDropdownLocations();
+    const loc = allLocations[index];
+    if (loc) this.map.setView([loc.lat, loc.lon], 10);
+  }
+
+  toggleDropdown(event: MouseEvent): void {
+    event.stopPropagation(); // verhindert, dass das Klick-Event global schließt
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+
+  getAllDropdownLocations(): { label: string, lat: number, lon: number }[] {
+    const visited = this.selectedLocations.map(loc => ({
+      label: `${loc.city}, ${loc.country}`,
+      lat: loc.lat,
+      lon: loc.lon
+    }));
   
+    const wishlist = this.allMarkers
+      .filter(m => m.type === 'wishlist')
+      .map(m => {
+        const latLng = m.marker.getLatLng();
+        const popup = m.marker.getPopup();
+        const label = popup ? popup.getContent()?.toString() : `Wunschort`;
+        return {
+          label: `★ ${label}`,
+          lat: latLng.lat,
+          lon: latLng.lng
+        };
+      });
   
+    return [...visited, ...wishlist];
+  }
 }
