@@ -1,0 +1,23 @@
+# Node modules (Frontend)
+node_modules/
+
+# Build output (Angular)
+dist/
+out-tsc/
+
+# Environment config (Backend)
+world-app/backend/.env
+
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Docker artifacts (optional, je nach Setup)
+*.log
+*.pid
+
+# IDEs / OS
+.vscode/
+.idea/
+.DS_Store
