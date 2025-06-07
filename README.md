@@ -1,31 +1,45 @@
 # Personalized Travel Recommendation System
 
-### Initialisierung
 
-1. Klone das GitHub-Repository
-   ```bash
-   https://github.com/melvinmng/WebEntwicklung_Projekt.git
-   ```
+## Backend Setup (Flask + Gemini)
 
-2. Öffne ein Terminal (im Projektverzeichnis) und wechsle zum Ordner der App.
-    ```bash
-    cd world-app
-    ```
+1. `.env` Datei im Verzeichnis `world-app/backend/` erstellen:
+```
+GEMINI_API_KEY=dein_gemini_api_key
+```
 
-3. Führe folgenden Befehl aus.
-    ```bash
-    npm install
-    ```
+2. Docker-Image bauen:
+```bash
+cd world-app/backend
+docker build -t flask-gemini-backend .
+```
 
-4. Starte die Web-App (der build-Prozess kann etwas dauern).
-    ```bash
-    npm start
-    ```
+3. Container starten:
+```bash
+docker run -p 5001:5000 flask-gemini-backend
+```
 
-    oder
 
-    ```bash
-    ng serve
-    ```
+## Frontend Setup (Angular)
 
-5. Öffne den Link aus dem Terminal im Browser.
+1. Repository klonen
+```bash
+git clone https://github.com/melvinmng/WebEntwicklung_Projekt.git
+cd WebEntwicklung_Projekt/world-app
+```
+
+2. Abhängigkeiten installieren
+```bash
+npm install
+```
+
+3. App starten
+```bash
+npm start
+# oder
+ng serve
+```
+4. Öffne den Link aus dem Terminal im Browser.
+
+
+
