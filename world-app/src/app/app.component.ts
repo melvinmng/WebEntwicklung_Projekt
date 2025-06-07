@@ -63,7 +63,7 @@ export class AppComponent implements AfterViewInit {
   }
 
   private getLocationDetails(lat: number, lon: number): void {
-    const url = `http://localhost:5000/api/reverse-geocode?lat=${lat}&lon=${lon}`;
+    const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
   
     this.http.get<any>(url).subscribe(data => {
       const city = data.city || 'Unbekannt';
