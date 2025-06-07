@@ -105,5 +105,28 @@ def reverse_geocode():
     return jsonify({"city": city, "country": country})
 
 
+
+@app.route('/api/search', methods=['GET'])
+def search_location():
+    query = request.args.get('query')
+    if not query:
+        return jsonify({'error': 'No query provided'}), 400
+
+    nominatim_url = (
+        f'https://nominatim.openstreetmap.org/search'
+        f'?q={query}&format=json&limit=1'
+    )
+
+    headers = {
+        'User-Agent': 'YourAppName/1.0 (your@email.com)'
+    }
+
+    response = requests.get(nominatim_url, headers=headers)
+    if response.status_code != 200:
+        return jsonify({'error': 'Failed to fetch location'}), 500
+
+    return jsonify(response.json())
+
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

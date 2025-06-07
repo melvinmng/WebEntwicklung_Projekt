@@ -5,7 +5,7 @@ import countriesData from './data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-
+import { FormsModule } from '@angular/forms';
 const countries: FeatureCollection = countriesData as FeatureCollection;
 
 @Component({
@@ -13,7 +13,7 @@ const countries: FeatureCollection = countriesData as FeatureCollection;
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, FormsModule],
 })
 export class AppComponent implements AfterViewInit {
   private map!: L.Map;
@@ -149,6 +149,30 @@ export class AppComponent implements AfterViewInit {
     this.activeMarkers.push({ marker, type });
   }
 
+
+  searchQuery: string = '';
+
+  searchAndAddMarker(): void {
+    if (!this.searchQuery) return;
+
+    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
+
+    this.http.get<any[]>(url).subscribe(results => {
+      if (results.length === 0) {
+        alert("Ort nicht gefunden.");
+        return;
+      }
+
+      const { lat, lon } = results[0];
+      const latNum = parseFloat(lat);
+      const lonNum = parseFloat(lon);
+
+      this.addUserMarker(latNum, lonNum);
+      this.getLocationDetails(latNum, lonNum);
+      this.map.setView([latNum, lonNum], 10);
+    });
+  }
+
   private getLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
     this.http.get<any>(url).subscribe(data => {
@@ -169,8 +193,13 @@ export class AppComponent implements AfterViewInit {
   
     this.isLoading = true;
     this.recommendations = '';
+    this.dropdownOpen = false;
+    this.recommendationsList = [];
   
-    const locationsParam = this.selectedLocations.map(loc => `${loc.city}, ${loc.country}`).join(',');
+    const locationsParam = this.selectedLocations
+      .map(loc => `${loc.city}, ${loc.country}`)
+      .join(',');
+  
     const url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
   
     this.http.get<any>(url).subscribe(response => {
@@ -205,6 +234,9 @@ export class AppComponent implements AfterViewInit {
         }
       }
   
+      // Empfehlungen für Dropdown speichern & Dropdown öffnen
+      this.recommendationsList = recommendations;
+      this.dropdownOpen = true;
       this.isLoading = false;
     }, error => {
       console.error('Fehler beim Abrufen:', error);
@@ -238,6 +270,28 @@ export class AppComponent implements AfterViewInit {
     this.recommendations = '';
   }
 
+  public dropdownOpen: boolean = false;
+
+  public recommendationsList: {
+    city: string;
+    country: string;
+    lat: number;
+    lon: number;
+    type: string;
+  }[] = [];
+
+  
+
+  toggleDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+  
+  flyToRecommendation(rec: { lat: number; lon: number }): void {
+    this.map.setView([rec.lat, rec.lon], 10);
+    this.dropdownOpen = false;
+  }
+
   flyToLocation(event: any): void {
     const index = event.target.value;
     const loc = this.selectedLocations[index];
@@ -256,7 +310,7 @@ export class AppComponent implements AfterViewInit {
     clearTimeout(this.navbarFadeTimeout);
     this.navbarFadeTimeout = setTimeout(() => {
       this.navbarVisible = false;
-    }, 3000);
+    }, 100);
   }
 
   legendVisible = false;
@@ -264,4 +318,12 @@ export class AppComponent implements AfterViewInit {
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
   }
+
+  ngOnInit(): void {
+    document.addEventListener('click', () => {
+      this.dropdownOpen = false;
+    });
+  }
+  
+  
 }

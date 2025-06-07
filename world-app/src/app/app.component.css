@@ -14,41 +14,102 @@ html, body {
   position: relative;
 }
 
+
 .navbar {
   position: absolute;
   top: 10%;
   left: 50%;
   transform: translateX(-50%);
-  background-color: rgba(30, 30, 30, 0.5);
-  padding: 12px 24px;
-  border-radius: 12px;
+  background-color: rgba(30, 30, 30, 0.85);
+  padding: 14px 24px;
+  border-radius: 16px;
   z-index: 2000;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   display: flex;
-  gap: 12px;
-  transition: background-color 0.5s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Inter', sans-serif;
 }
 
-.navbar.visible {
-  background-color: rgba(30, 30, 30, 0.9);
+.navbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
 }
 
 .navbar button,
-.navbar select {
-  background-color: #1976d2;
+.navbar select,
+.navbar input {
+  background-color: #2979ff;
   color: white;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-  font-weight: bold;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
 }
 
 .navbar button:hover,
-.navbar select:hover {
-  background-color: #125ba3;
+.navbar select:hover,
+.navbar input:hover {
+  background-color: #1565c0;
 }
+
+.navbar input {
+  border: none;
+  outline: none;
+  min-width: 180px;
+}
+
+/* Recommendation button with embedded arrow */
+.recommendation-button-wrapper {
+  position: relative;
+}
+
+.dropdown-icon {
+  margin-left: 8px;
+  font-size: 12px;
+  pointer-events: auto;
+}
+
+/* Dropdown box styling */
+.recommendation-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #ffffff;
+  color: #1c1c1c;
+  font-family: inherit;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+  min-width: 250px;
+  padding: 8px;
+}
+
+.recommendation-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.recommendation-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.recommendation-dropdown li:hover {
+  background-color: #eeeeee;
+}
+
 
 /* Info Overlay */
 .map-overlay {
@@ -184,4 +245,34 @@ html, body {
   to {
     transform: rotate(360deg);
   }
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1f2937;
+  color: white;
+  min-width: 280px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 10;
+  padding: 6px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #374151;
 }
