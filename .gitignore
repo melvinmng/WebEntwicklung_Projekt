@@ -6,7 +6,7 @@ dist/
 out-tsc/
 
 # Environment config (Backend)
-world-app/backend/.env
+world-app/backend/api-service/.env
 
 
 # Python cache

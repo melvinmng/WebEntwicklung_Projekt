@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build:
+      context: ./backend/auth-service
+    container_name: auth-service
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./backend/auth-service:/app
+    restart: unless-stopped
+
+  api-service:
+    build:
+      context: ./backend
+    container_name: api-service
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/app
+    restart: unless-stopped
