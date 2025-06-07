@@ -2,17 +2,22 @@ import { Component, AfterViewInit } from '@angular/core';
 import * as L from 'leaflet';
 import countriesData from './data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
+import { HttpClient } from '@angular/common/http';
 
 const countries: FeatureCollection = countriesData as FeatureCollection;
 
 @Component({
   selector: 'app-root',
-  template: `<div id="map"></div>`,
+  templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
   private map!: L.Map;
   private countries = countries;
+
+  public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
+
+  constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -25,6 +30,7 @@ export class AppComponent implements AfterViewInit {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
 
+    // GeoJSON Länder anzeigen
     L.geoJSON(this.countries, {
       style: {
         color: 'blue',
@@ -42,5 +48,29 @@ export class AppComponent implements AfterViewInit {
         layer.bindTooltip(countryName);
       }
     }).addTo(this.map);
+
+    // Klick auf Karte → Marker + Geolocation
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      this.addMarker(lat, lon);
+      this.getLocationDetails(lat, lon);
+    });
+  }
+
+  private addMarker(lat: number, lon: number): void {
+    L.marker([lat, lon]).addTo(this.map);
+  }
+
+  private getLocationDetails(lat: number, lon: number): void {
+    const url = `http://localhost:5000/api/reverse-geocode?lat=${lat}&lon=${lon}`;
+  
+    this.http.get<any>(url).subscribe(data => {
+      const city = data.city || 'Unbekannt';
+      const country = data.country || 'Unbekannt';
+  
+      this.selectedLocations.push({ city, country, lat, lon });
+      console.log('→ Ort hinzugefügt (via Flask):', city, country);
+    });
   }
 }

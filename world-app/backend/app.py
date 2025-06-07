@@ -3,7 +3,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import google.generativeai as genai
-
+import requests
 # Load environment variables
 load_dotenv()
 
@@ -39,6 +39,37 @@ def recommendations():
     print("Gemini response:", response.text)
 
     return jsonify({"recommendations": response.text})
+
+
+@app.route('/api/reverse-geocode', methods=['GET'])
+def reverse_geocode():
+    lat = request.args.get('lat')
+    lon = request.args.get('lon')
+
+    if not lat or not lon:
+        return jsonify({"error": "Missing latitude or longitude"}), 400
+
+    nominatim_url = (
+        f"https://nominatim.openstreetmap.org/reverse"
+        f"?format=json&lat={lat}&lon={lon}&zoom=10&addressdetails=1"
+    )
+
+    headers = {
+        'User-Agent': 'YourAppName/1.0 (you@example.com)'  # wichtig laut Nominatim-Richtlinien
+    }
+
+    response = requests.get(nominatim_url, headers=headers)
+
+    if response.status_code != 200:
+        return jsonify({"error": "Failed to fetch location data"}), 500
+
+    data = response.json()
+    address = data.get('address', {})
+    city = address.get('city') or address.get('town') or address.get('village') or 'Unbekannt'
+    country = address.get('country') or 'Unbekannt'
+
+    return jsonify({"city": city, "country": country})
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
