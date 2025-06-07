@@ -13,3 +13,12 @@
   <h3>Empfehlungen:</h3>
   <pre>{{ recommendations }}</pre>
 </div>
+
+<div style="margin-top: 20px; text-align: center;">
+  <button (click)="generateRecommendations()">Empfehlungen generieren</button>
+</div>
+
+<div *ngIf="recommendations" style="margin-top: 20px;">
+  <h3>Empfehlungen</h3>
+  <pre>{{ recommendations }}</pre>
+</div>

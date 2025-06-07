@@ -19,7 +19,7 @@ export class AppComponent implements AfterViewInit {
   private countries = countries;
 
   public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
-
+  public recommendations: string = '';
   constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
@@ -74,6 +74,20 @@ export class AppComponent implements AfterViewInit {
   
       this.selectedLocations.push({ city, country, lat, lon });
       console.log('→ Ort hinzugefügt (via Flask):', city, country);
+    });
+  }
+  generateRecommendations(): void {
+    if (this.selectedLocations.length === 0) return;
+
+    const locationsParam = this.selectedLocations
+      .map(loc => `${loc.city}, ${loc.country}`)
+      .join(',');
+
+    const url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
+
+    this.http.get<any>(url).subscribe(data => {
+      this.recommendations = data.recommendations || 'Keine Empfehlungen erhalten.';
+      console.log('→ Empfehlungen erhalten:', this.recommendations);
     });
   }
 }
