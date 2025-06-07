@@ -68,6 +68,19 @@ export class AppComponent implements AfterViewInit, OnInit {
         this.goHome();
       };
 
+      // Orte zurücksetzen-Button (🗑️)
+      const resetBtn = document.createElement('a');
+      resetBtn.href = '#';
+      resetBtn.title = 'Alle Orte zurücksetzen';
+      resetBtn.className = 'leaflet-custom-button';
+      resetBtn.innerHTML = '🗑️';
+      resetBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.clearLocations();
+      };
+
+controlGroup.appendChild(resetBtn); // hinzufügen
       controlGroup.appendChild(undoBtn);
       controlGroup.appendChild(homeBtn);
       mapContainer.appendChild(controlGroup);
