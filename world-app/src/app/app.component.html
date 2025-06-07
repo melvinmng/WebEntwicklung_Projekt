@@ -1,18 +1,39 @@
+<!-- Navigationsleiste -->
+<div 
+  class="navbar" 
+  [class.visible]="navbarVisible" 
+  (mouseenter)="showNavbar()" 
+  (mouseleave)="startNavbarFadeTimer()">
+
+  <button (click)="generateRecommendations()" [disabled]="isLoading">
+    <span>Empfehlungen generieren</span>
+    <span *ngIf="isLoading" class="loading-spinner"></span>
+  </button>
+  <button (click)="clearLocations()">Orte zurücksetzen</button>
+
+  <select (change)="flyToLocation($event)">
+    <option disabled selected>Ort auswählen...</option>
+    <option *ngFor="let loc of selectedLocations; let i = index" [value]="i">
+      {{ loc.city }}, {{ loc.country }}
+    </option>
+  </select>
+</div>
+
+<!-- Karte -->
 <div id="map"></div>
 
-<!-- Overlay auf der Karte -->
-<div class="map-overlay">
-  <h3>Ausgewählte Orte:</h3>
+
+<!-- Legende -->
+<div class="legend-toggle" (click)="toggleLegend()">
+  ℹ️ Legende
+</div>
+
+<div class="legend-box" [class.visible]="legendVisible">
+  <h4>Legende</h4>
   <ul>
-    <li *ngFor="let loc of selectedLocations">
-      {{ loc.city }}, {{ loc.country }}
-    </li>
+    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png" width="15"> Eigene Orte</li>
+    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png" width="15"> Safe Guess</li>
+    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png" width="15"> Experimentell</li>
+    <li><img src="https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png" width="15"> Geheimtipp</li>
   </ul>
-
-  <button (click)="generateRecommendations()">Empfehlungen generieren</button>
-
-  <div *ngIf="recommendations" style="margin-top: 10px;">
-    <h3>Empfehlungen:</h3>
-    <pre>{{ recommendations }}</pre>
-  </div>
 </div>

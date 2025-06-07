@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 import requests
+import re
 # Load environment variables
 load_dotenv()
 
@@ -12,6 +13,8 @@ model = genai.GenerativeModel('gemini-2.0-flash')
 
 app = Flask(__name__)
 CORS(app)
+
+
 
 @app.route('/api/recommendations', methods=['GET'])
 def recommendations():
@@ -29,16 +32,47 @@ def recommendations():
     "Empfehle ihm basierend darauf **drei weitere Städte**, die ihm gefallen könnten. "
     "Gib **nur** den Namen der Stadt und das zugehörige Land aus – ohne weitere Informationen oder Erklärungen. "
     "Strukturiere deine Antwort exakt wie folgt:\n\n"
-    "1. Safe Guess: <Stadt>, <Land>\n"
-    "2. Experimentell: <Stadt>, <Land>\n"
-    "3. Geheimtipp: <Stadt>, <Land>"
+    "1. safe: <Stadt>, <Land>\n"
+    "2. experimental: <Stadt>, <Land>\n"
+    "3. hidden: <Stadt>, <Land>"
     )
 
     response = model.generate_content(prompt)
 
     print("Gemini response:", response.text)
 
-    return jsonify({"recommendations": response.text})
+    recommendation_text = response.text
+
+    pattern = r"\d\.\s*(\w+):\s*(.*?),\s*(.*?)\n?"
+    matches = re.findall(pattern, recommendation_text)
+
+    results = []
+
+    for typ, city, country in matches:
+        print(f"Geocoding: {city}, {country}")
+        geo_url = (
+            f"https://nominatim.openstreetmap.org/search?"
+            f"city={city}&country={country}&format=json&limit=1"
+        )
+        geo_response = requests.get(geo_url, headers={"User-Agent": "travel-app/1.0"})
+
+        if geo_response.status_code == 200 and geo_response.json():
+            location = geo_response.json()[0]
+            lat = float(location["lat"])
+            lon = float(location["lon"])
+        else:
+            lat = None
+            lon = None
+
+        results.append({
+            "type": typ.lower(),
+            "city": city,
+            "country": country,
+            "lat": lat,
+            "lon": lon
+        })
+
+    return jsonify({"recommendations": results})
 
 
 @app.route('/api/reverse-geocode', methods=['GET'])
