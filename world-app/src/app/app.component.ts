@@ -1,4 +1,5 @@
 import { Component, AfterViewInit } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
 import * as L from 'leaflet';
 import countriesData from './data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
@@ -8,8 +9,10 @@ const countries: FeatureCollection = countriesData as FeatureCollection;
 
 @Component({
   selector: 'app-root',
+  standalone: true,
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  imports: [CommonModule],
 })
 export class AppComponent implements AfterViewInit {
   private map!: L.Map;
