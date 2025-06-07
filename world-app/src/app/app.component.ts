@@ -4,6 +4,7 @@ import * as L from 'leaflet';
 import countriesData from './data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 
 const countries: FeatureCollection = countriesData as FeatureCollection;
 
@@ -12,7 +13,7 @@ const countries: FeatureCollection = countriesData as FeatureCollection;
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
 })
 export class AppComponent implements AfterViewInit {
   private map!: L.Map;
