@@ -30,3 +30,12 @@ def login():
         return jsonify({'error': 'Ungültige Anmeldedaten'}), 401
 
     return jsonify({'message': 'Login erfolgreich'}), 200
+
+
+@auth_bp.route('/status', methods=['GET'])
+def status():
+    return jsonify({'status': 'Auth-Service läuft'}), 200
+
+@auth_bp.route('/users', methods=['GET'])
+def get_users():
+    return jsonify({'registered_users': list(users.keys())}), 200
