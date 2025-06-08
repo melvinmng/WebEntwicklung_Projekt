@@ -29,3 +29,21 @@
     ```
 
 5. Öffne den Link aus dem Terminal im Browser.
+
+### Backend starten
+1. Abhängigkeiten installieren
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. API-Key setzen (z.B. in der Shell)
+   ```bash
+   export AVIATIONSTACK_API_KEY=<DEIN_API_KEY>
+   ```
+3. Backend starten
+   ```bash
+   python flight_api/app.py
+   ```
+4. Beispielaufruf
+   ```bash
+   curl "http://localhost:5000/api/flights?origin=FRA&destination=JFK&date=2025-07-01"
+   ```
