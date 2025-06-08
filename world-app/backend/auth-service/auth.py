@@ -6,6 +6,9 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    print("📥 POST /register wurde aufgerufen")
+    data = request.json
+    print(f"🔍 Daten empfangen: {data}")
     data = request.json
     username = data.get('username')
     password = data.get('password')

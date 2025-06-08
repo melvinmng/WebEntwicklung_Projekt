@@ -1,3 +1,4 @@
 Flask
 bcrypt
 python-dotenv
+flask-cors
