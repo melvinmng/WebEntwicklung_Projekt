@@ -37,7 +37,9 @@
    ```
 2. API-Key setzen (z.B. in der Shell)
    ```bash
-   export AVIATIONSTACK_API_KEY=<DEIN_API_KEY>
+   export RAPIDAPI_KEY=<DEIN_API_KEY>
+   # optional, falls abweichend
+   export RAPIDAPI_HOST=flight-data.p.rapidapi.com
    ```
 3. Backend starten
    ```bash

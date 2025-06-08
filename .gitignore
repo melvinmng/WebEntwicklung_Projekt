@@ -1,0 +1,5 @@
+# Ignore node dependencies and build artefacts
+world-app/node_modules/
+world-app/dist/
+world-app/.angular/
+__pycache__/
