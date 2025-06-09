@@ -1,0 +1,8 @@
+<div class="flights">
+  <h2>Flüge</h2>
+  <ul>
+    <li *ngFor="let flight of flights">
+      {{ flight.from }} → {{ flight.to }} – {{ flight.price }} €
+    </li>
+  </ul>
+</div>
