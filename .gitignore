@@ -1,3 +1,5 @@
+.venv
+
 # Node modules (Frontend)
 node_modules/
 
