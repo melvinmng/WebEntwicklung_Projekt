@@ -311,7 +311,9 @@ export class MapComponent implements AfterViewInit, OnInit {
             this.flightResultsList = [];
           } else {
             this.flightError = '';
-            this.flightResultsList = data?.flights || [];
+            this.flightResultsList = (data?.flights || []).sort(
+              (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
+            );
           }
           this.flightResultsVisible = true;
         },

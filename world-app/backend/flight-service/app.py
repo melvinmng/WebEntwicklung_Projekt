@@ -34,6 +34,14 @@ def flights():
             ),
             fetch_mode=fetch_mode,
         )
+        # Sort flights by price ascending before returning
+        try:
+            flights_sorted = sorted(
+                result.flights, key=lambda f: float(getattr(f, "price", 0))
+            )
+            result = result.__class__(**{**result.__dict__, "flights": flights_sorted})
+        except Exception:
+            pass
         return jsonify(result)
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 404
