@@ -263,12 +263,10 @@ export class MapComponent implements AfterViewInit, OnInit {
   flightFormVisible = false;
   flightOrigin = '';
   flightDestination = '';
-  flightDate = '';
+  flightDate = '2025-06-23';
   flightSeat = 'economy';
   flightAdults = 1;
   flightChildren = 0;
-  flightInfantsSeat = 0;
-  flightInfantsLap = 0;
   flightResults: any = null;
   flightResultsVisible = false;
   flightResultsList: any[] = [];
@@ -300,8 +298,6 @@ export class MapComponent implements AfterViewInit, OnInit {
       seat: this.flightSeat,
       adults: this.flightAdults.toString(),
       children: this.flightChildren.toString(),
-      infants_in_seat: this.flightInfantsSeat.toString(),
-      infants_on_lap: this.flightInfantsLap.toString(),
     });
     this.http
       .get(`http://localhost:5003/flights?${params.toString()}`)

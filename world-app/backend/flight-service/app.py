@@ -8,9 +8,9 @@ CORS(app)
 
 @app.route("/flights", methods=["GET"])
 def flights():
-    date = request.args.get("date")
-    origin = request.args.get("from_airport")
-    destination = request.args.get("to_airport")
+    date = str(request.args.get("date"))
+    origin = str(request.args.get("from_airport")).upper()
+    destination = str(request.args.get("to_airport")).upper()
 
     if not date or not origin or not destination:
         return jsonify({"error": "date, from_airport and to_airport are required"}), 400
@@ -19,9 +19,7 @@ def flights():
     seat = request.args.get("seat", "economy")
     adults = int(request.args.get("adults", 1))
     children = int(request.args.get("children", 0))
-    infants_in_seat = int(request.args.get("infants_in_seat", 0))
-    infants_on_lap = int(request.args.get("infants_on_lap", 0))
-    fetch_mode = request.args.get("fetch_mode", "fallback")
+    fetch_mode = request.args.get("fetch_mode", "local")
 
     try:
         result: Result = fetch_flights(
@@ -33,8 +31,6 @@ def flights():
             passengers=Passengers(
                 adults=adults,
                 children=children,
-                infants_in_seat=infants_in_seat,
-                infants_on_lap=infants_on_lap,
             ),
             fetch_mode=fetch_mode,
         )
