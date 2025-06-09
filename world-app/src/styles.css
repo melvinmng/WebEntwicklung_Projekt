@@ -1,8 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 
+ :root {
+	--navbar-bg: rgba(255, 255, 255, 0.8);
+	--navbar-link: #555555;
+	--navbar-link-hover: #333333;
+	--navbar-link-active-bg: #007bff;
+	--navbar-link-active-color: #ffffff;
+	--navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 html, body {
     height: 100%;
     margin: 0;
     padding: 0;
   }
-  
