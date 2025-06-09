@@ -263,8 +263,9 @@ export class MapComponent implements AfterViewInit, OnInit {
   flightFormVisible = false;
   flightOrigin = '';
   flightDestination = '';
-  flightDate = '2025-06-23';
+  flightDate = '';
   flightSeat = 'economy';
+  flightTrip = 'one-way';
   flightAdults = 1;
   flightChildren = 0;
   flightResults: any = null;
@@ -295,6 +296,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       from_airport: this.flightOrigin,
       to_airport: this.flightDestination,
       date: this.flightDate,
+      trip: this.flightTrip,
       seat: this.flightSeat,
       adults: this.flightAdults.toString(),
       children: this.flightChildren.toString(),

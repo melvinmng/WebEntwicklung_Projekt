@@ -102,6 +102,12 @@
         <label>Datum
           <input type="date" [(ngModel)]="flightDate" name="date" required />
         </label>
+        <label>Reiseart
+          <select [(ngModel)]="flightTrip" name="trip">
+            <option value="one-way">One-Way</option>
+            <option value="round-trip">Round Trip</option>
+          </select>
+        </label>
         <label>Sitzklasse
           <select [(ngModel)]="flightSeat" name="seat">
             <option value="economy">Economy</option>
@@ -123,9 +129,15 @@
       <div class="flight-results-box" *ngIf="flightResultsVisible" (click)="$event.stopPropagation()">
         <h3>Ergebnisse</h3>
         <div *ngIf="flightError" class="flight-error">{{ flightError }}</div>
-        <ul>
-          <li *ngFor="let r of flightResultsList">
-            {{ r.date }} {{ r.time }} - {{ r.price }}
+        <ul class="flight-list">
+          <li *ngFor="let r of flightResultsList" class="flight-item">
+            <div class="flight-airports">
+              {{ flightOrigin.toUpperCase() }} → {{ flightDestination.toUpperCase() }}
+            </div>
+            <div class="flight-times">
+              {{ r.departure }} → {{ r.arrival }}
+            </div>
+            <div class="flight-price">{{ r.price }}</div>
           </li>
         </ul>
       </div>

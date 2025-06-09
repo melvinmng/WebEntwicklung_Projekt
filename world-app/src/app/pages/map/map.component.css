@@ -339,6 +339,32 @@ html, body {
     margin-bottom: 8px;
   }
 
+  .flight-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .flight-item:last-child {
+    border-bottom: none;
+  }
+
+  .flight-airports {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .flight-times {
+    color: #555;
+    margin-bottom: 4px;
+  }
+
+  .flight-price {
+    font-weight: bold;
+    color: #2979ff;
+  }
+
   .flight-error {
     color: red;
     margin-bottom: 10px;
