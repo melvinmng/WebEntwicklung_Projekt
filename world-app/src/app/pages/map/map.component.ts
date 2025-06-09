@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -257,6 +257,72 @@ export class MapComponent implements AfterViewInit, OnInit {
       this.getLocationDetails(lat, lon);
       this.map.setView([lat, lon], 10);
     });
+  }
+
+  // ----- Flight search -----
+  flightFormVisible = false;
+  flightOrigin = '';
+  flightDestination = '';
+  flightDate = '';
+  flightSeat = 'economy';
+  flightAdults = 1;
+  flightChildren = 0;
+  flightInfantsSeat = 0;
+  flightInfantsLap = 0;
+  flightResults: any = null;
+  flightResultsVisible = false;
+  flightResultsList: any[] = [];
+  flightError = '';
+
+  openFlightSearch(): void {
+    this.flightFormVisible = true;
+    this.flightResultsVisible = false;
+  }
+
+  closeFlightSearch(): void {
+    this.flightFormVisible = false;
+    this.flightResults = null;
+    this.flightResultsVisible = false;
+    this.flightResultsList = [];
+    this.flightError = '';
+  }
+
+  closeFlightResults(): void {
+    this.flightResultsVisible = false;
+  }
+
+  searchFlights(): void {
+    if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
+    const params = new URLSearchParams({
+      from_airport: this.flightOrigin,
+      to_airport: this.flightDestination,
+      date: this.flightDate,
+      seat: this.flightSeat,
+      adults: this.flightAdults.toString(),
+      children: this.flightChildren.toString(),
+      infants_in_seat: this.flightInfantsSeat.toString(),
+      infants_on_lap: this.flightInfantsLap.toString(),
+    });
+    this.http
+      .get(`http://localhost:5003/flights?${params.toString()}`)
+      .subscribe({
+        next: (data: any) => {
+          this.flightResults = data;
+          if (data && data.error) {
+            this.flightError = data.error;
+            this.flightResultsList = [];
+          } else {
+            this.flightError = '';
+            this.flightResultsList = data?.flights || [];
+          }
+          this.flightResultsVisible = true;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.flightError = err.error?.error || 'Fehler bei der Abfrage';
+          this.flightResultsList = [];
+          this.flightResultsVisible = true;
+        }
+      });
   }
 
   ngOnInit(): void {

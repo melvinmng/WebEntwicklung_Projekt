@@ -284,3 +284,62 @@ html, body {
   .dropdown-item:hover {
     background-color: #374151;
   }
+
+  .flight-search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+  }
+
+  .flight-popup-container {
+    display: flex;
+    gap: 20px;
+  }
+
+  .flight-search-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+  }
+
+  .flight-search-box form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .flight-search-box button {
+    margin-top: 10px;
+  }
+
+  .flight-results-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .flight-results-box ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .flight-results-box li {
+    margin-bottom: 8px;
+  }
+
+  .flight-error {
+    color: red;
+    margin-bottom: 10px;
+  }

@@ -1,25 +1,46 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from fast_flights import FlightData, Passengers, Result, get_flights
+from fast_flights import FlightData, Passengers, Result, get_flights as fetch_flights
 
 app = Flask(__name__)
 CORS(app)
 
 
 @app.route("/flights", methods=["GET"])
-def get_flights():
-    result: Result = get_flights(
-        flight_data=[
-            FlightData(date="2025-01-01", from_airport="TPE", to_airport="MYJ")
-        ],
-        trip="one-way",
-        seat="economy",
-        passengers=Passengers(
-            adults=2, children=1, infants_in_seat=0, infants_on_lap=0
-        ),
-        fetch_mode="fallback",
-    )
-    return jsonify(result)
+def flights():
+    date = request.args.get("date")
+    origin = request.args.get("from_airport")
+    destination = request.args.get("to_airport")
+
+    if not date or not origin or not destination:
+        return jsonify({"error": "date, from_airport and to_airport are required"}), 400
+
+    trip = request.args.get("trip", "one-way")
+    seat = request.args.get("seat", "economy")
+    adults = int(request.args.get("adults", 1))
+    children = int(request.args.get("children", 0))
+    infants_in_seat = int(request.args.get("infants_in_seat", 0))
+    infants_on_lap = int(request.args.get("infants_on_lap", 0))
+    fetch_mode = request.args.get("fetch_mode", "fallback")
+
+    try:
+        result: Result = fetch_flights(
+            flight_data=[
+                FlightData(date=date, from_airport=origin, to_airport=destination)
+            ],
+            trip=trip,
+            seat=seat,
+            passengers=Passengers(
+                adults=adults,
+                children=children,
+                infants_in_seat=infants_in_seat,
+                infants_on_lap=infants_on_lap,
+            ),
+            fetch_mode=fetch_mode,
+        )
+        return jsonify(result)
+    except RuntimeError as e:
+        return jsonify({"error": str(e)}), 404
 
 
 if __name__ == "__main__":
