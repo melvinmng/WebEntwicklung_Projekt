@@ -7,6 +7,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
+import { NavbarComponent } from '../navbar/navbar.component';
+
 const countries: FeatureCollection = countriesData as FeatureCollection;
 type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 
@@ -15,7 +17,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  imports: [CommonModule, HttpClientModule, FormsModule]
+  imports: [CommonModule, HttpClientModule, FormsModule, NavbarComponent]
 })
 export class MapComponent implements AfterViewInit, OnInit {
   private map!: L.Map;
@@ -331,16 +333,16 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
-  navbarVisible = true;
-  private navbarFadeTimeout: any = null;
-  showNavbar(): void {
-    this.navbarVisible = true;
-    clearTimeout(this.navbarFadeTimeout);
+  aiToolbarVisible = true;
+  private aiToolbarFadeTimeout: any = null;
+  showAiToolbar(): void {
+    this.aiToolbarVisible = true;
+    clearTimeout(this.aiToolbarFadeTimeout);
   }
-  startNavbarFadeTimer(): void {
-    clearTimeout(this.navbarFadeTimeout);
-    this.navbarFadeTimeout = setTimeout(() => {
-      this.navbarVisible = false;
+  startAiToolbarFadeTimer(): void {
+    clearTimeout(this.aiToolbarFadeTimeout);
+    this.aiToolbarFadeTimeout = setTimeout(() => {
+      this.aiToolbarVisible = false;
     }, 100);
   }
 

@@ -1,5 +1,7 @@
-<div class="navbar" [class.visible]="navbarVisible" (mouseenter)="showNavbar()" (mouseleave)="startNavbarFadeTimer()">
-    <div class="navbar-group">
+<app-navbar></app-navbar>
+
+<div class="aiToolbar" [class.visible]="aiToolbarVisible" (mouseenter)="showAiToolbar()" (mouseleave)="startAiToolbarFadeTimer()">
+    <div class="aiToolbar-group">
       <!-- Empfehlungsbutton mit integriertem Dropdown-Pfeil -->
       <div class="recommendation-button-wrapper">
         <button (click)="generateRecommendations()" [disabled]="isLoading">
@@ -24,7 +26,6 @@
         </div>
       </div>
   
-      
       <select (change)="flyToLocation($event)">
         <option disabled selected>Ort auswählen...</option>
         <option 
@@ -44,9 +45,9 @@
       <button (click)="openFlightSearch()">Flüge finden</button>
     </div>
   </div>
+
   <!-- Karte -->
   <div id="map"></div>
-  
   
   <!-- Legenden-Toggle-Button -->
   <div class="legend-toggle" (click)="toggleLegend()">Legende</div>

@@ -1,371 +1,359 @@
-/* Fullscreen */
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    width: 100%;
-  }
-  
-  /* Karte */
-  #map {
-    height: 100vh;
-    width: 100vw;
-    z-index: 0;
-    position: relative;
-  }
-  
-  
-  .navbar {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(30, 30, 30, 0.85);
-    padding: 14px 24px;
-    border-radius: 16px;
-    z-index: 2000;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  .navbar-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .navbar button,
-  .navbar select,
-  .navbar input {
-    background-color: #2979ff;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-family: inherit;
-  }
-  
-  .navbar button:hover,
-  .navbar select:hover,
-  .navbar input:hover {
-    background-color: #1565c0;
-  }
-  
-  .navbar input {
-    border: none;
-    outline: none;
-    min-width: 180px;
-  }
-  
-  /* Recommendation button with embedded arrow */
-  .recommendation-button-wrapper {
-    position: relative;
-  }
-  
-  .dropdown-icon {
-    margin-left: 8px;
-    font-size: 12px;
-    pointer-events: auto;
-  }
-  
-  /* Dropdown box styling */
-  .recommendation-dropdown {
-    position: absolute;
-    top: 110%;
-    left: 0;
-    background: #ffffff;
-    color: #1c1c1c;
-    font-family: inherit;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    z-index: 1000;
-    min-width: 250px;
-    padding: 8px;
-  }
-  
-  .recommendation-dropdown ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .recommendation-dropdown li {
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-  }
-  
-  .recommendation-dropdown li:hover {
-    background-color: #eeeeee;
-  }
-  
-  
-  /* Info Overlay */
-  .map-overlay {
-    position: absolute;
-    top: 80px;
-    left: 20px;
-    background-color: rgba(255, 255, 255, 0.85);
-    padding: 15px;
-    border-radius: 8px;
-    z-index: 1000;
-    max-width: 300px;
-    font-family: sans-serif;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
-  }
-  
-  .leaflet-control-custom {
-    text-align: center;
-    font-size: 18px;
-    line-height: 28px;
-    width: 32px;
-    height: 32px;
-  }
-  
-  .leaflet-custom-group {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .leaflet-custom-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: white;
-    width: 30px;
-    height: 30px;
-    border-bottom: 1px solid #ccc;
-    font-size: 16px;
-    color: black;
-    cursor: pointer;
-    user-select: none;
-    pointer-events: auto;
-  }
-  
-  .leaflet-custom-button:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .leaflet-custom-button:last-child {
-    border-bottom: none;
-  }
-  
-  
-  .legend-toggle {
-    position: absolute;
-    bottom: 15px;
-    right: 15px;
-    background: white;
-    padding: 6px 12px;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    z-index: 1000;
-    font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 500;
-    user-select: none;
-    transition: background 0.3s ease;
-  }
-  
-  .legend-toggle:hover {
-    background: #f0f0f0;
-  }
-  
-  .legend-box {
-    position: absolute;
-    bottom: 55px;
-    right: 15px;
-    background: white;
-    padding: 12px 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    display: none;
-    z-index: 1000;
-    font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    color: #333;
-    min-width: 200px;
-  }
-  
-  .legend-box.visible {
-    display: block;
-  }
-  
-  .legend-box h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 15px;
-    font-weight: 600;
-  }
-  
-  .legend-box ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .legend-box li {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-    font-size: 14px;
-  }
-  
-  .legend-box input[type="checkbox"] {
-    margin-right: 8px;
-    cursor: pointer;
-  }
-  
-  .legend-box label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    width: 100%;
-  }
-  
-  .loading-spinner {
-    width: 14px;
-    height: 14px;
-    border: 2px solid #ccc;
-    border-top: 2px solid #333;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 6px;
-  }
-  
-  @keyframes spin {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  .dropdown-container {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: #1f2937;
-    color: white;
-    min-width: 280px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    z-index: 10;
-    padding: 6px 0;
-  }
-  
-  .dropdown-item {
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 14px;
-    font-family: inherit;
-    transition: background 0.2s;
-  }
-  
-  .dropdown-item:hover {
-    background-color: #374151;
-  }
+/* Karte */
+#map {
+  height: 100vh;
+  width: 100vw;
+  z-index: 0;
+  position: relative;
+}
 
-  .flight-search-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-  }
 
-  .flight-popup-container {
-    display: flex;
-    gap: 20px;
-  }
+/* aiToolbar */
+.aiToolbar {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(30, 30, 30, 0.85);
+  padding: 14px 24px;
+  border-radius: 16px;
+  z-index: 2000;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
 
-  .flight-search-box {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 320px;
-  }
+.aiToolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
 
-  .flight-search-box form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+.aiToolbar button,
+.aiToolbar select,
+.aiToolbar input {
+  background-color: #2979ff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
 
-  .flight-search-box button {
-    margin-top: 10px;
-  }
+.aiToolbar button:hover,
+.aiToolbar select:hover,
+.aiToolbar input:hover {
+  background-color: #1565c0;
+}
 
-  .flight-results-box {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 320px;
-    max-height: 400px;
-    overflow-y: auto;
-  }
+.aiToolbar input {
+  border: none;
+  outline: none;
+  min-width: 180px;
+}
 
-  .flight-results-box ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+/* Recommendation button with embedded arrow */
+.recommendation-button-wrapper {
+  position: relative;
+}
 
-  .flight-results-box li {
-    margin-bottom: 8px;
-  }
+.dropdown-icon {
+  margin-left: 8px;
+  font-size: 12px;
+  pointer-events: auto;
+}
 
-  .flight-item {
-    display: flex;
-    flex-direction: column;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-  }
+/* Dropdown box styling */
+.recommendation-dropdown {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: #ffffff;
+  color: #1c1c1c;
+  font-family: inherit;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 1000;
+  min-width: 250px;
+  padding: 8px;
+}
 
-  .flight-item:last-child {
-    border-bottom: none;
-  }
+.recommendation-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 
-  .flight-airports {
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
+.recommendation-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
 
-  .flight-times {
-    color: #555;
-    margin-bottom: 4px;
-  }
+.recommendation-dropdown li:hover {
+  background-color: #eeeeee;
+}
 
-  .flight-price {
-    font-weight: bold;
-    color: #2979ff;
-  }
 
-  .flight-error {
-    color: red;
-    margin-bottom: 10px;
+/* Info Overlay */
+.map-overlay {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  padding: 15px;
+  border-radius: 8px;
+  z-index: 1000;
+  max-width: 300px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.leaflet-control-custom {
+  text-align: center;
+  font-size: 18px;
+  line-height: 28px;
+  width: 32px;
+  height: 32px;
+}
+
+.leaflet-custom-group {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.leaflet-custom-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  width: 30px;
+  height: 30px;
+  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  user-select: none;
+  pointer-events: auto;
+}
+
+.leaflet-custom-button:hover {
+  background-color: #f0f0f0;
+}
+
+.leaflet-custom-button:last-child {
+  border-bottom: none;
+}
+
+.legend-toggle {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+  transition: background 0.3s ease;
+}
+
+.legend-toggle:hover {
+  background: #f0f0f0;
+}
+
+.legend-box {
+  position: absolute;
+  bottom: 55px;
+  right: 15px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: none;
+  z-index: 1000;
+  font-size: 14px;
+  font-weight: 400;
+  color: #333;
+  min-width: 200px;
+}
+
+.legend-box.visible {
+  display: block;
+}
+
+.legend-box h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.legend-box ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legend-box li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.legend-box input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.legend-box label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.loading-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1f2937;
+  color: white;
+  min-width: 280px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  z-index: 10;
+  padding: 6px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #374151;
+}
+
+.flight-search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.flight-popup-container {
+  display: flex;
+  gap: 20px;
+}
+
+.flight-search-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+}
+
+.flight-search-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flight-search-box button {
+  margin-top: 10px;
+}
+
+.flight-results-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.flight-results-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flight-results-box li {
+  margin-bottom: 8px;
+}
+
+.flight-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.flight-item:last-child {
+  border-bottom: none;
+}
+
+.flight-airports {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.flight-times {
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.flight-price {
+  font-weight: bold;
+  color: #2979ff;
+}
+
+.flight-error {
+  color: red;
+  margin-bottom: 10px;
+}
