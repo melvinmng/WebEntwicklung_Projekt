@@ -15,7 +15,7 @@ html, body {
   }
   
   
-  .navbar {
+  .aiToolbar {
     position: absolute;
     top: 10%;
     left: 50%;
@@ -32,7 +32,7 @@ html, body {
     font-family: 'Inter', sans-serif;
   }
   
-  .navbar-group {
+  .aiToolbar-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
@@ -40,9 +40,9 @@ html, body {
     justify-content: center;
   }
   
-  .navbar button,
-  .navbar select,
-  .navbar input {
+  .aiToolbar button,
+  .aiToolbar select,
+  .aiToolbar input {
     background-color: #2979ff;
     color: white;
     border: none;
@@ -55,13 +55,13 @@ html, body {
     font-family: inherit;
   }
   
-  .navbar button:hover,
-  .navbar select:hover,
-  .navbar input:hover {
+  .aiToolbar button:hover,
+  .aiToolbar select:hover,
+  .aiToolbar input:hover {
     background-color: #1565c0;
   }
   
-  .navbar input {
+  .aiToolbar input {
     border: none;
     outline: none;
     min-width: 180px;
