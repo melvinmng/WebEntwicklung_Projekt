@@ -95,7 +95,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       maxZoom: 18,
       maxBounds: [[-85, -180], [85, 180]],
       maxBoundsViscosity: 1.0,
-	  zoomControl: false // Standard-Zoom-Control deaktivieren!
+	  zoomControl: false // Standard-Zoom-Control deaktivieren
     });
 
 	L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
