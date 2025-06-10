@@ -38,23 +38,11 @@ export class MapComponent implements AfterViewInit, OnInit {
     wishlist: true
   };
 
-  // AI-Toolbar Bindings
-  searchQuery = '';
-  dropdownOpen = false;
-  recommendationsList: {
-    city: string;
-    country: string;
-    lat: number;
-    lon: number;
-    type: string;
-  }[] = [];
-  legendVisible = false;
-
   constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
     this.initMap();
-    const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
+    const mapContainer = document.querySelector('.leaflet-top.leaflet-left');
     if (mapContainer) {
       const controlGroup = document.createElement('div');
       controlGroup.className = 'leaflet-bar leaflet-control leaflet-custom-group';
@@ -63,7 +51,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       undoBtn.href = '#';
       undoBtn.title = 'Letzten Marker wiederherstellen';
       undoBtn.className = 'leaflet-custom-button';
-      undoBtn.innerHTML = '↩️';
+      undoBtn.innerHTML = '⮌';
       undoBtn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -101,23 +89,17 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [35, 0],
+      center: [20, 0],
       zoom: 2,
       minZoom: 2,
       maxZoom: 18,
       maxBounds: [[-85, -180], [85, 180]],
-      maxBoundsViscosity: 1.0,
-	  zoomControl: false // Standard-Zoom-Control deaktivieren
+      maxBoundsViscosity: 1.0
     });
 
-	L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
-
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+      attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
-
-    // Zoom-Control nach unten rechts
-    L.control.zoom({ position: 'bottomright' }).addTo(this.map);
 
     L.geoJSON(this.countries, {
       style: { color: 'blue', weight: 1, fillOpacity: 0.1 }
@@ -198,8 +180,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.allMarkers.push({ marker, type });
   }
 
-  // --- AI-Toolbar Event-Handler ---
-  onGenerateRecommendations(): void {
+  generateRecommendations(): void {
     if (this.selectedLocations.length === 0) return;
     this.isLoading = true;
     this.recommendationsList = [];
@@ -236,46 +217,6 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
-  onToggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
-  onFlyToRecommendation(rec: any): void {
-    this.map.setView([rec.lat, rec.lon], 10);
-    this.dropdownOpen = false;
-  }
-
-  onFlyToLocation(index: number): void {
-    const loc = this.selectedLocations[index];
-    if (loc) this.map.setView([loc.lat, loc.lon], 10);
-  }
-
-  onSearchQueryChange(query: string): void {
-    this.searchQuery = query;
-  }
-
-  onSearchAndAddMarker(): void {
-    if (!this.searchQuery) return;
-    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
-    this.http.get<any[]>(url).subscribe(results => {
-      if (!results.length) {
-        alert("Ort nicht gefunden.");
-        return;
-      }
-      const { lat, lon } = results[0];
-      this.addMarker(lat, lon, 'user');
-      this.getLocationDetails(lat, lon);
-      this.map.setView([lat, lon], 10);
-    });
-  }
-
-  // --- Legende ---
-  toggleLegend(): void {
-    this.legendVisible = !this.legendVisible;
-  }
-
-  // --- Marker- und Karten-Controls ---
   toggleMarkerVisibility(type: MarkerType): void {
     this.markerVisibility[type] = !this.markerVisibility[type];
     this.allMarkers.forEach(({ marker, type: t }) => {
@@ -304,9 +245,158 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.recommendations = '';
   }
 
+  searchQuery = '';
+  searchAndAddMarker(): void {
+    if (!this.searchQuery) return;
+    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
+    this.http.get<any[]>(url).subscribe(results => {
+      if (!results.length) {
+        alert("Ort nicht gefunden.");
+        return;
+      }
+      const { lat, lon } = results[0];
+      this.addMarker(lat, lon, 'user');
+      this.getLocationDetails(lat, lon);
+      this.map.setView([lat, lon], 10);
+    });
+  }
+
+  // ----- Flight search -----
+  flightFormVisible = false;
+  flightOrigin = '';
+  flightDestination = '';
+  flightDate = '';
+  flightSeat = 'economy';
+  flightTrip = 'one-way';
+  flightAdults = 1;
+  flightChildren = 0;
+  flightResults: any = null;
+  flightResultsVisible = false;
+  flightResultsList: any[] = [];
+  flightError = '';
+
+  openFlightSearch(): void {
+    this.flightFormVisible = true;
+    this.flightResultsVisible = false;
+  }
+
+  closeFlightSearch(): void {
+    this.flightFormVisible = false;
+    this.flightResults = null;
+    this.flightResultsVisible = false;
+    this.flightResultsList = [];
+    this.flightError = '';
+  }
+
+  closeFlightResults(): void {
+    this.flightResultsVisible = false;
+  }
+
+  searchFlights(): void {
+    if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
+    const params = new URLSearchParams({
+      from_airport: this.flightOrigin,
+      to_airport: this.flightDestination,
+      date: this.flightDate,
+      trip: this.flightTrip,
+      seat: this.flightSeat,
+      adults: this.flightAdults.toString(),
+      children: this.flightChildren.toString(),
+    });
+    this.http
+      .get(`http://localhost:5003/flights?${params.toString()}`)
+      .subscribe({
+        next: (data: any) => {
+          this.flightResults = data;
+          if (data && data.error) {
+            this.flightError = data.error;
+            this.flightResultsList = [];
+          } else {
+            this.flightError = '';
+            this.flightResultsList = (data?.flights || []).sort(
+              (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
+            );
+          }
+          this.flightResultsVisible = true;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.flightError = err.error?.error || 'Fehler bei der Abfrage';
+          this.flightResultsList = [];
+          this.flightResultsVisible = true;
+        }
+      });
+  }
+
   ngOnInit(): void {
     document.addEventListener('click', () => {
       this.dropdownOpen = false;
     });
+  }
+
+  aiToolbarVisible = true;
+  private aiToolbarFadeTimeout: any = null;
+  showAiToolbar(): void {
+    this.aiToolbarVisible = true;
+    clearTimeout(this.aiToolbarFadeTimeout);
+  }
+  startAiToolbarFadeTimer(): void {
+    clearTimeout(this.aiToolbarFadeTimeout);
+    this.aiToolbarFadeTimeout = setTimeout(() => {
+      this.aiToolbarVisible = false;
+    }, 100);
+  }
+
+  legendVisible = false;
+  toggleLegend(): void {
+    this.legendVisible = !this.legendVisible;
+  }
+
+  dropdownOpen = false;
+  recommendationsList: {
+    city: string;
+    country: string;
+    lat: number;
+    lon: number;
+    type: string;
+  }[] = [];
+
+  flyToRecommendation(rec: { lat: number; lon: number }): void {
+    this.map.setView([rec.lat, rec.lon], 10);
+    this.dropdownOpen = false;
+  }
+
+  flyToLocation(event: any): void {
+    const index = event.target.value;
+    const allLocations = this.getAllDropdownLocations();
+    const loc = allLocations[index];
+    if (loc) this.map.setView([loc.lat, loc.lon], 10);
+  }
+
+  toggleDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  getAllDropdownLocations(): { label: string, lat: number, lon: number }[] {
+    const visited = this.selectedLocations.map(loc => ({
+      label: `${loc.city}, ${loc.country}`,
+      lat: loc.lat,
+      lon: loc.lon
+    }));
+
+    const wishlist = this.allMarkers
+      .filter(m => m.type === 'wishlist')
+      .map(m => {
+        const latLng = m.marker.getLatLng();
+        const popup = m.marker.getPopup();
+        const label = popup ? popup.getContent()?.toString() : `Wunschort`;
+        return {
+          label: `★ ${label}`,
+          lat: latLng.lat,
+          lon: latLng.lng
+        };
+      });
+
+    return [...visited, ...wishlist];
   }
 }
