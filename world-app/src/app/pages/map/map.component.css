@@ -6,7 +6,6 @@
   position: relative;
 }
 
-
 /* aiToolbar */
 .aiToolbar {
   position: absolute;
@@ -155,7 +154,7 @@
 
 .legend-toggle {
   position: absolute;
-  bottom: 15px;
+  bottom: 30px;
   right: 15px;
   background: white;
   padding: 6px 12px;
@@ -175,7 +174,7 @@
 
 .legend-box {
   position: absolute;
-  bottom: 55px;
+  bottom: 65px;
   right: 15px;
   background: white;
   padding: 12px 16px;

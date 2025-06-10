@@ -42,7 +42,7 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   ngAfterViewInit(): void {
     this.initMap();
-    const mapContainer = document.querySelector('.leaflet-top.leaflet-left');
+    const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
     if (mapContainer) {
       const controlGroup = document.createElement('div');
       controlGroup.className = 'leaflet-bar leaflet-control leaflet-custom-group';
@@ -51,7 +51,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       undoBtn.href = '#';
       undoBtn.title = 'Letzten Marker wiederherstellen';
       undoBtn.className = 'leaflet-custom-button';
-      undoBtn.innerHTML = '⮌';
+      undoBtn.innerHTML = '↩️';
       undoBtn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -89,16 +89,19 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [20, 0],
+      center: [35, 0],
       zoom: 2,
       minZoom: 2,
       maxZoom: 18,
       maxBounds: [[-85, -180], [85, 180]],
-      maxBoundsViscosity: 1.0
+      maxBoundsViscosity: 1.0,
+	  zoomControl: false // Standard-Zoom-Control deaktivieren!
     });
 
+	L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
+      attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
     L.geoJSON(this.countries, {
