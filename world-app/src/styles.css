@@ -7,6 +7,28 @@
   --navbar-link-color-hover: #007bff; /* Farbe der Navbar-Links beim Hover */
   --navbar-link-active-bg: #007bff; /* Hintergrundfarbe des aktiven Navbar-Links */
   --navbar-link-active-color: #fff; /* Textfarbe des aktiven Navbar-Links */
+
+  /* Grau */
+  --gray1: #1c1c1e;
+  --gray2: #2c2c2e;
+  --gray3: #3a3a3c;
+  --gray4: #636366;
+  --gray5: #8e8e93;
+  --gray6: #c7c7cc;
+  --gray7: #e5e5ea;
+
+  /* Blau */
+  --blue1: #002c4d;
+  --blue2: #003d7a;
+  --blue3: #0051a8;
+  --blue4: #007aff;
+  --blue5: #5ac8fa;
+  --blue6: #a0ddfb;
+  --blue7: #d0f0ff;
+}
+
+}
+
 }
 
 html, body {
