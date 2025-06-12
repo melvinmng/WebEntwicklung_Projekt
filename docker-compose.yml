@@ -19,6 +19,13 @@ services:
     ports:
       - "5003:5003"
 
+  db-service:
+    build:
+      context: world-app/backend/db-service
+    ports:
+      - "5004:5004"
+      
+  
   frontend:
     build:
       context: ./world-app
@@ -27,3 +34,4 @@ services:
     depends_on:
       - api-service
       - auth-service
+      - db-service
