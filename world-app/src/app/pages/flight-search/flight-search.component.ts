@@ -65,6 +65,7 @@ export class FlightSearchComponent {
   closeFlightResults(): void {
     this.flightResultsVisible = false;
   }
+  
 
   searchFlights(): void {
     if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
@@ -101,11 +102,20 @@ export class FlightSearchComponent {
       });
   }
 
+  getFlightBookingURL(): string {
+    return `https://www.expedia.com/Flights-Search?flight-type=on&mode=search&trip=${this.flightTrip}&leg1=from:${this.flightOrigin},to:${this.flightDestination},departure:${this.flightDate}TANYT,fromType:AIRPORT,toType:AIRPORT&options=cabinclass:${this.flightSeat}&fromDate=${this.flightDate}&passengers=children:${this.flightChildren}[7],adults:${this.flightAdults},infantinlap:N`;
+  }
+
+  openBookingPage(): void {
+    this.flightBookingURL = this.getFlightBookingURL();
+    window.open(this.flightBookingURL, '_blank');
+  }
+
   openBookingOverlay(): void {
     this.flightFormVisible = false;
     this.flightResultsVisible = false;
     this.bookingVisible = true;
-    this.flightBookingURL = `https://www.expedia.com/Flights-Search?flight-type=on&mode=search&trip=${this.flightTrip}&leg1=from:${this.flightOrigin},to:${this.flightDestination},departure:${this.flightDate}TANYT,fromType:AIRPORT,toType:AIRPORT&options=cabinclass:${this.flightSeat}&fromDate=${this.flightDate}&passengers=children:${this.flightChildren}[7],adults:${this.flightAdults},infantinlap:N`;
+    this.flightBookingURL = this.getFlightBookingURL();
   }
 
   closeBookingOverlay(): void {
