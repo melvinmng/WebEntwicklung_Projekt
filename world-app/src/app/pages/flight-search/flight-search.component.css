@@ -1,0 +1,125 @@
+button {
+    margin: 50%;
+}
+
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--gray2);
+  color: var(--white);
+  min-width: 280px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px var(--shadow);
+  z-index: 10;
+  padding: 6px 0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: var(--gray1);
+}
+
+.flight-search-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+}
+
+.flight-popup-container {
+  display: flex;
+  gap: 20px;
+}
+
+.flight-search-box {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 1em;
+  width: 320px;
+}
+
+.flight-search-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.flight-search-box button[type="submit"] {
+  margin-top: 10px;
+  background-color: var(--blue4);
+  color: var(--white);
+}
+
+.flight-search-box button[type="button"] {
+  margin-top: 10px;
+  background-color: var(--gray6);
+}
+
+.flight-results-box {
+  background: var(--white);
+  padding: 20px;
+  border-radius: 1em;
+  width: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.flight-results-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flight-results-box li {
+  margin-bottom: 8px;
+}
+
+.flight-item {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--gray5);
+}
+
+.flight-item:last-child {
+  border-bottom: none;
+}
+
+.flight-airports {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.flight-times {
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.flight-price {
+  font-weight: bold;
+  color: var(--blue4);
+}
+
+.flight-error {
+  color: var(--red);
+  margin-bottom: 10px;
+}

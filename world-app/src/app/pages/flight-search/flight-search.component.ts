@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-import { NavbarComponent } from '../navbar/navbar.component';
 import { MapComponent } from '../map/map.component';
 
 @Component({
   selector: 'app-flight-search',
-  imports: [FormsModule, NavbarComponent, MapComponent],
+  imports: [CommonModule, HttpClientModule, FormsModule, MapComponent],
   standalone: true,
   templateUrl: './flight-search.component.html',
   styleUrl: './flight-search.component.css'
@@ -31,6 +31,7 @@ export class FlightSearchComponent {
   flightError = '';
 
   openFlightSearch(): void {
+    console.log('openFlightSearch aufgerufen');
     this.flightFormVisible = true;
     this.flightResultsVisible = false;
   }
@@ -59,7 +60,7 @@ export class FlightSearchComponent {
       children: this.flightChildren.toString(),
     });
     this.http
-      .get(`http://localhost:5003/flights?${params.toString()}`)
+      .get(`http://localhost:5003/flight-search?${params.toString()}`)
       .subscribe({
         next: (data: any) => {
           this.flightResults = data;
