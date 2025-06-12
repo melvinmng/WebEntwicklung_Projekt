@@ -52,15 +52,15 @@ def write_to_db():
 
 
 
-@app.route("/api/db-read/username/<user_name>", methods=["GET"])
-def read_user_by_name(user_name):
+@app.route("/api/db-read/USER/<USER>", methods=["GET"])
+def read_user_by_name(USER):
     headers = {
         "apikey": SUPABASE_API_KEY,
         "Authorization": f"Bearer {SUPABASE_API_KEY}",
     }
 
     params = {
-        "USER": f"eq.{user_name}",
+        "USER": f"eq.{USER}",
         "select": "*"
     }
 
@@ -78,6 +78,33 @@ def read_user_by_name(user_name):
             return jsonify({"error": "Kein Eintrag mit diesem Benutzernamen gefunden"}), 404
     else:
         return jsonify({"error": "Fehler beim Lesen", "details": response.text}), 400
+    
+
+@app.route("/api/db-update/<username>", methods=["PATCH"])
+def update_user_data(username):
+    data = request.json  # z. B. {"USERLOC": [...]} oder {"WISHLOC": [...]}
+
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    params = {
+        "USER": f"eq.{username}"
+    }
+
+    response = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}",
+        headers=headers,
+        params=params,
+        json=data
+    )
+
+    if response.status_code in [200, 204]:
+        return jsonify({"message": "Update erfolgreich"}), 200
+    else:
+        return jsonify({"error": "Fehler beim Aktualisieren", "details": response.text}), 400
     
 
 if __name__ == "__main__":
