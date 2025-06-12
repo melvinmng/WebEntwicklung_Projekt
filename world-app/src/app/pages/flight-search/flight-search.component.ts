@@ -25,6 +25,7 @@ export class FlightSearchComponent {
   flightTrip = 'one-way';
   flightAdults = 1;
   flightChildren = 0;
+  flightBookingURL = '';
   flightResults: any = null;
   flightResultsVisible = false;
   flightResultsList: any[] = [];
@@ -104,8 +105,7 @@ export class FlightSearchComponent {
     this.flightFormVisible = false;
     this.flightResultsVisible = false;
     this.bookingVisible = true;
-
-    /* this.bookingURL = "https://www.google.com/travel/flights?q=Flights to  from FRA on 2025-09-13 one way business class&curr=USD" */
+    this.flightBookingURL = `https://www.expedia.com/Flights-Search?flight-type=on&mode=search&trip=${this.flightTrip}&leg1=from:${this.flightOrigin},to:${this.flightDestination},departure:${this.flightDate}TANYT,fromType:AIRPORT,toType:AIRPORT&options=cabinclass:${this.flightSeat}&fromDate=${this.flightDate}&passengers=children:${this.flightChildren}[7],adults:${this.flightAdults},infantinlap:N`;
   }
 
   closeBookingOverlay(): void {
