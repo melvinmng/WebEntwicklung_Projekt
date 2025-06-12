@@ -29,6 +29,7 @@ export class FlightSearchComponent {
   flightResultsVisible = false;
   flightResultsList: any[] = [];
   flightError = '';
+  bookingVisible = false;
 
   openFlightSearch(): void {
     console.log('openFlightSearch aufgerufen');
@@ -42,6 +43,22 @@ export class FlightSearchComponent {
     this.flightResultsVisible = false;
     this.flightResultsList = [];
     this.flightError = '';
+  }
+
+  resetFlightSearch(): void {
+    this.flightOrigin = '';
+    this.flightDestination = '';
+    this.flightDate = '';
+    this.flightSeat = 'economy';
+    this.flightTrip = 'one-way';
+    this.flightAdults = 1;
+    this.flightChildren = 0;
+    this.flightResults = null;
+    this.flightResultsVisible = false;
+    this.flightResultsList = [];
+    this.flightError = '';
+    this.bookingVisible = false;
+    this.flightFormVisible = true;
   }
 
   closeFlightResults(): void {
@@ -82,5 +99,18 @@ export class FlightSearchComponent {
         }
       });
   }
-  // ----- Flight search Ende -----
+
+  openBookingOverlay(): void {
+    this.flightFormVisible = false;
+    this.flightResultsVisible = false;
+    this.bookingVisible = true;
+
+    /* this.bookingURL = "https://www.google.com/travel/flights?q=Flights to  from FRA on 2025-09-13 one way business class&curr=USD" */
+  }
+
+  closeBookingOverlay(): void {
+    this.bookingVisible = false;
+    this.flightFormVisible = true;
+    this.flightResultsVisible = true;
+  }
 }

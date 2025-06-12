@@ -27,3 +27,4 @@ services:
     depends_on:
       - api-service
       - auth-service
+      - flight-service

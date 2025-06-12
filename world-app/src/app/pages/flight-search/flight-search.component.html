@@ -35,6 +35,8 @@
             <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
         </label>
         <button type="submit">Suchen</button>
+        <button type="button" (click)="openBookingOverlay()">Direkt zur Buchungsseite</button>
+        <button type="button" (click)="resetFlightSearch()">Zurücksetzen</button>
         <button type="button" (click)="closeFlightSearch()">Schließen</button>
         </form>
         </div>
@@ -55,3 +57,8 @@
         </div>
     </div>
 </div>
+
+<!-- Buchungsseite -->
+ <!--<div class="booking-overlay" *ngIf="bookingVisible" (click)="closeBookingOverlay()">
+    <iframe class="booking-iframe" [src]="" (load)="onBookingLoad()"></iframe>
+</div> -->
