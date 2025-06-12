@@ -1,5 +1,26 @@
-button {
-    margin: 50%;
+.container {
+  position: relative; /* Wichtig!  Bezugspunkt für absolute Positionierung */
+  width: 100%;       /* Oder eine feste Breite */
+  height: 100%;      /* Oder eine feste Höhe für die Karte, anpassen! */
+}
+
+app-map {
+  display: block;    /* Wichtig, damit app-map die volle Höhe und Breite einnimmt */
+  width: 100%;
+  height: 100%;
+}
+
+.container > button { /* Direktes Kindelement des Containers */
+  position: absolute;
+  top: 100px;        /* Abstand vom oberen Rand */
+  left: 100px;       /* Abstand vom linken Rand */
+  z-index: 10;      /* Über der Karte */
+  background-color: rgba(0, 0, 0, 0.5); /* Halbtransparenter Hintergrund */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .dropdown-container {

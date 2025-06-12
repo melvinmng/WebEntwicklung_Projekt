@@ -1,0 +1,44 @@
+<div class="aiToolbar" [class.visible]="aiToolbarVisible" (mouseenter)="showAiToolbar()" (mouseleave)="startAiToolbarFadeTimer()">
+    <div class="aiToolbar-group">
+      <!-- Empfehlungsbutton mit integriertem Dropdown-Pfeil -->
+      <div class="recommendation-button-wrapper">
+        <button (click)="generateRecommendations()" [disabled]="isLoading">
+          <span>Empfehlungen generieren</span>
+          <span *ngIf="isLoading" class="loading-spinner"></span>
+          <span 
+            *ngIf="recommendationsList.length > 0" 
+            class="dropdown-icon" 
+            (click)="toggleDropdown($event)">
+            ▼
+          </span>
+        </button>
+  
+        <div class="recommendation-dropdown" *ngIf="dropdownOpen">
+          <ul>
+            <li 
+              *ngFor="let rec of recommendationsList" 
+              (click)="flyToRecommendation(rec)">
+              {{ rec.type }}: {{ rec.city }}, {{ rec.country }}
+            </li>
+          </ul>
+        </div>
+      </div>
+  
+      <select (change)="flyToLocation($event)">
+        <option disabled selected>Ort auswählen...</option>
+        <option 
+          *ngFor="let loc of getAllDropdownLocations(); let i = index" 
+          [value]="i">
+          {{ loc.label }}
+        </option>
+      </select>
+  
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        placeholder="Stadt, Land suchen..."
+        (keydown.enter)="searchAndAddMarker()"
+        class="search-input"
+      />
+    </div>
+  </div>
