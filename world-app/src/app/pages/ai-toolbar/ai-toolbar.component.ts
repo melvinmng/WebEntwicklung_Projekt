@@ -1,1 +1,0 @@
-// aiToolbar, die bisher noch in der map component ist auslagern

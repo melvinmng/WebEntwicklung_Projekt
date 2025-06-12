@@ -6,7 +6,7 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route("/flights", methods=["GET"])
+@app.route("/flight-search", methods=["GET"])
 def flights():
     date = str(request.args.get("date"))
     origin = str(request.args.get("from_airport")).upper()

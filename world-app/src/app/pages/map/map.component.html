@@ -1,145 +1,44 @@
 <app-navbar></app-navbar>
 
-<div class="aiToolbar" [class.visible]="aiToolbarVisible" (mouseenter)="showAiToolbar()" (mouseleave)="startAiToolbarFadeTimer()">
-    <div class="aiToolbar-group">
-      <!-- Empfehlungsbutton mit integriertem Dropdown-Pfeil -->
-      <div class="recommendation-button-wrapper">
-        <button (click)="generateRecommendations()" [disabled]="isLoading">
-          <span>Empfehlungen generieren</span>
-          <span *ngIf="isLoading" class="loading-spinner"></span>
-          <span 
-            *ngIf="recommendationsList.length > 0" 
-            class="dropdown-icon" 
-            (click)="toggleDropdown($event)">
-            ▼
-          </span>
-        </button>
-  
-        <div class="recommendation-dropdown" *ngIf="dropdownOpen">
-          <ul>
-            <li 
-              *ngFor="let rec of recommendationsList" 
-              (click)="flyToRecommendation(rec)">
-              {{ rec.type }}: {{ rec.city }}, {{ rec.country }}
-            </li>
-          </ul>
-        </div>
-      </div>
-  
-      <select (change)="flyToLocation($event)">
-        <option disabled selected>Ort auswählen...</option>
-        <option 
-          *ngFor="let loc of getAllDropdownLocations(); let i = index" 
-          [value]="i">
-          {{ loc.label }}
-        </option>
-      </select>
-  
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        placeholder="Stadt, Land suchen..."
-        (keydown.enter)="searchAndAddMarker()"
-        class="search-input"
-      />
-      <button (click)="openFlightSearch()">Flüge finden</button>
-    </div>
-  </div>
+<!-- Karte -->
+<div id="map"></div>
 
-  <!-- Karte -->
-  <div id="map"></div>
-  
-  <!-- Legenden-Toggle-Button -->
-  <div class="legend-toggle" (click)="toggleLegend()">Legende</div>
-  
-  <!-- Legenden-Box -->
-  <div class="legend-box" [class.visible]="legendVisible">
-    <h4>Marker anzeigen:</h4>
-    <ul>
-      <li>
-        <label>
-          <input type="checkbox" [checked]="markerVisibility.safe" (change)="toggleMarkerVisibility('safe')" />
-          🟡 Safe
-        </label>
-      </li>
-      <li>
-        <label>
-          <input type="checkbox" [checked]="markerVisibility.experimental" (change)="toggleMarkerVisibility('experimental')" />
-          🔵 Experimental
-        </label>
-      </li>
-      <li>
-        <label>
-          <input type="checkbox" [checked]="markerVisibility.hidden" (change)="toggleMarkerVisibility('hidden')" />
-          🟢 Geheimtipp
-        </label>
-      </li>
-      <li>
-        <label>
-          <input type="checkbox" [checked]="markerVisibility.wishlist" (change)="toggleMarkerVisibility('wishlist')" />
-          🟣 Wunschliste
-        </label>
-      </li>
-      <li>
-        <label>
-          <input type="checkbox" [checked]="markerVisibility.user" (change)="toggleMarkerVisibility('user')" />
-          🔴 Besucht
-        </label>
-      </li>
-    </ul>
-  </div>
-  
-  <!-- Flug-Suchformular -->
-  <div class="flight-search-overlay" *ngIf="flightFormVisible" (click)="closeFlightSearch()">
-    <div class="flight-popup-container" (click)="$event.stopPropagation()">
-      <div class="flight-search-box">
-        <form (ngSubmit)="searchFlights()">
-        <label>Von
-          <input [(ngModel)]="flightOrigin" name="origin" required />
-        </label>
-        <label>Nach
-          <input [(ngModel)]="flightDestination" name="destination" required />
-        </label>
-        <label>Datum
-          <input type="date" [(ngModel)]="flightDate" name="date" required />
-        </label>
-        <label>Reiseart
-          <select [(ngModel)]="flightTrip" name="trip">
-            <option value="one-way">One-Way</option>
-          </select>
-        </label>
-        <label>Sitzklasse
-          <select [(ngModel)]="flightSeat" name="seat">
-            <option value="economy">Economy</option>
-            <option value="premium-economy">Premium Economy</option>
-            <option value="business">Business</option>
-            <option value="first">First</option>
-          </select>
-        </label>
-        <label>Erwachsene
-          <input type="number" [(ngModel)]="flightAdults" name="adults" min="1" />
-        </label>
-        <label>Kinder
-          <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
-        </label>
-        <button type="submit">Suchen</button>
-        <button type="button" (click)="closeFlightSearch()">Schließen</button>
-      </form>
-      </div>
-      <div class="flight-results-box" *ngIf="flightResultsVisible" (click)="$event.stopPropagation()">
-        <h3>Ergebnisse</h3>
-        <div *ngIf="flightError" class="flight-error">{{ flightError }}</div>
-        <ul class="flight-list">
-          <li *ngFor="let r of flightResultsList" class="flight-item">
-            <div class="flight-airports">
-              {{ flightOrigin.toUpperCase() }} → {{ flightDestination.toUpperCase() }}
-            </div>
-            <div class="flight-times">
-              {{ r.departure }} → {{ r.arrival }}
-            </div>
-            <div class="flight-price">{{ r.price }}</div>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<!-- Legenden-Toggle-Button -->
+<div class="legend-toggle" (click)="toggleLegend()">Legende</div>
+
+<!-- Legenden-Box -->
+<div class="legend-box" [class.visible]="legendVisible">
+  <h4>Marker anzeigen:</h4>
+  <ul>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.safe" (change)="toggleMarkerVisibility('safe')" />
+        🟡 Safe
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.experimental" (change)="toggleMarkerVisibility('experimental')" />
+        🔵 Experimental
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.hidden" (change)="toggleMarkerVisibility('hidden')" />
+        🟢 Geheimtipp
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.wishlist" (change)="toggleMarkerVisibility('wishlist')" />
+        🟣 Wunschliste
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.user" (change)="toggleMarkerVisibility('user')" />
+        🔴 Besucht
+      </label>
+    </li>
+  </ul>
+</div>

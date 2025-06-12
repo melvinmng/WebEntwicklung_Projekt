@@ -124,6 +124,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
+  /* Konvertiert Koordinaten in Namen */
   private getLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
     this.http.get<any>(url).subscribe(data => {
@@ -134,6 +135,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
+  /* Konvertiert Koordinaten in Namen + Wishlist */
   private getWishlistLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
     this.http.get<any>(url).subscribe(data => {
@@ -143,6 +145,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
+  /* Marker + Farben */
   private getIcon(type: MarkerType): L.Icon {
     const colors: Record<MarkerType, string> = {
       user: 'red',
@@ -162,6 +165,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
+  /* Marker hinzufügen */
   private addMarker(lat: number, lon: number, type: MarkerType, city = '', country = ''): void {
     const marker = L.marker([lat, lon], {
       icon: this.getIcon(type),
@@ -183,6 +187,122 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.allMarkers.push({ marker, type });
   }
 
+   /* Marker an/aus in Legende */
+  toggleMarkerVisibility(type: MarkerType): void {
+    this.markerVisibility[type] = !this.markerVisibility[type];
+    this.allMarkers.forEach(({ marker, type: t }) => {
+      if (t === type) {
+        this.markerVisibility[t] ? marker.addTo(this.map) : this.map.removeLayer(marker);
+      }
+    });
+  }
+
+  /* Marker wiederherstellen */
+  restoreLastMarker(): void {
+    const last = this.removedMarkersStack.pop();
+    if (!last) return;
+    const { lat, lon, type, data } = last;
+    this.addMarker(lat, lon, type, data?.city, data?.country);
+  }
+
+  /* Standardansicht */
+  goHome(): void {
+    this.map.setView([this.initialView.lat, this.initialView.lon], this.initialView.zoom);
+  }
+
+  /* Mülleimer */
+  clearLocations(): void {
+    this.selectedLocations = [];
+    this.allMarkers.forEach(m => this.map.removeLayer(m.marker));
+    this.allMarkers = [];
+    this.removedMarkersStack = [];
+    this.recommendations = '';
+  }
+
+  /* Orte suchen */
+  searchQuery = '';
+  searchAndAddMarker(): void {
+    if (!this.searchQuery) return;
+    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
+    this.http.get<any[]>(url).subscribe(results => {
+      if (!results.length) {
+        alert("Ort nicht gefunden.");
+        return;
+      }
+      const { lat, lon } = results[0];
+      this.addMarker(lat, lon, 'user');
+      this.getLocationDetails(lat, lon);
+      this.map.setView([lat, lon], 10);
+    });
+  }
+
+  /* Dropdown (Orte?) */
+  ngOnInit(): void {
+    document.addEventListener('click', () => {
+      this.dropdownOpen = false;
+    });
+  }
+
+  /* Legende anzeigen */
+  legendVisible = false;
+  toggleLegend(): void {
+    this.legendVisible = !this.legendVisible;
+  }
+
+  /* gesuchter Ort fokussieren */
+  flyToLocation(event: any): void {
+    const index = event.target.value;
+    const allLocations = this.getAllDropdownLocations();
+    const loc = allLocations[index];
+    if (loc) this.map.setView([loc.lat, loc.lon], 10);
+  }
+
+  /* ? */
+  toggleDropdown(event: MouseEvent): void {
+    event.stopPropagation();
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  /* ? */
+  getAllDropdownLocations(): { label: string, lat: number, lon: number }[] {
+    const visited = this.selectedLocations.map(loc => ({
+      label: `${loc.city}, ${loc.country}`,
+      lat: loc.lat,
+      lon: loc.lon
+    }));
+
+    const wishlist = this.allMarkers
+      .filter(m => m.type === 'wishlist')
+      .map(m => {
+        const latLng = m.marker.getLatLng();
+        const popup = m.marker.getPopup();
+        const label = popup ? popup.getContent()?.toString() : `Wunschort`;
+        return {
+          label: `★ ${label}`,
+          lat: latLng.lat,
+          lon: latLng.lng
+        };
+      });
+
+    return [...visited, ...wishlist];
+  }
+
+  /* EVTL: NUR DESIGN
+  aiToolbarVisible = true;
+  private aiToolbarFadeTimeout: any = null;
+  showAiToolbar(): void {
+    this.aiToolbarVisible = true;
+    clearTimeout(this.aiToolbarFadeTimeout);
+  }
+  startAiToolbarFadeTimer(): void {
+    clearTimeout(this.aiToolbarFadeTimeout);
+    this.aiToolbarFadeTimeout = setTimeout(() => {
+      this.aiToolbarVisible = false;
+    }, 100);
+  }
+  */
+
+  /* RAUS */
   generateRecommendations(): void {
     if (this.selectedLocations.length === 0) return;
     this.isLoading = true;
@@ -220,140 +340,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
-  toggleMarkerVisibility(type: MarkerType): void {
-    this.markerVisibility[type] = !this.markerVisibility[type];
-    this.allMarkers.forEach(({ marker, type: t }) => {
-      if (t === type) {
-        this.markerVisibility[t] ? marker.addTo(this.map) : this.map.removeLayer(marker);
-      }
-    });
-  }
-
-  restoreLastMarker(): void {
-    const last = this.removedMarkersStack.pop();
-    if (!last) return;
-    const { lat, lon, type, data } = last;
-    this.addMarker(lat, lon, type, data?.city, data?.country);
-  }
-
-  goHome(): void {
-    this.map.setView([this.initialView.lat, this.initialView.lon], this.initialView.zoom);
-  }
-
-  clearLocations(): void {
-    this.selectedLocations = [];
-    this.allMarkers.forEach(m => this.map.removeLayer(m.marker));
-    this.allMarkers = [];
-    this.removedMarkersStack = [];
-    this.recommendations = '';
-  }
-
-  searchQuery = '';
-  searchAndAddMarker(): void {
-    if (!this.searchQuery) return;
-    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
-    this.http.get<any[]>(url).subscribe(results => {
-      if (!results.length) {
-        alert("Ort nicht gefunden.");
-        return;
-      }
-      const { lat, lon } = results[0];
-      this.addMarker(lat, lon, 'user');
-      this.getLocationDetails(lat, lon);
-      this.map.setView([lat, lon], 10);
-    });
-  }
-
-  // ----- Flight search -----
-  flightFormVisible = false;
-  flightOrigin = '';
-  flightDestination = '';
-  flightDate = '';
-  flightSeat = 'economy';
-  flightTrip = 'one-way';
-  flightAdults = 1;
-  flightChildren = 0;
-  flightResults: any = null;
-  flightResultsVisible = false;
-  flightResultsList: any[] = [];
-  flightError = '';
-
-  openFlightSearch(): void {
-    this.flightFormVisible = true;
-    this.flightResultsVisible = false;
-  }
-
-  closeFlightSearch(): void {
-    this.flightFormVisible = false;
-    this.flightResults = null;
-    this.flightResultsVisible = false;
-    this.flightResultsList = [];
-    this.flightError = '';
-  }
-
-  closeFlightResults(): void {
-    this.flightResultsVisible = false;
-  }
-
-  searchFlights(): void {
-    if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
-    const params = new URLSearchParams({
-      from_airport: this.flightOrigin,
-      to_airport: this.flightDestination,
-      date: this.flightDate,
-      trip: this.flightTrip,
-      seat: this.flightSeat,
-      adults: this.flightAdults.toString(),
-      children: this.flightChildren.toString(),
-    });
-    this.http
-      .get(`http://localhost:5003/flights?${params.toString()}`)
-      .subscribe({
-        next: (data: any) => {
-          this.flightResults = data;
-          if (data && data.error) {
-            this.flightError = data.error;
-            this.flightResultsList = [];
-          } else {
-            this.flightError = '';
-            this.flightResultsList = (data?.flights || []).sort(
-              (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
-            );
-          }
-          this.flightResultsVisible = true;
-        },
-        error: (err: HttpErrorResponse) => {
-          this.flightError = err.error?.error || 'Fehler bei der Abfrage';
-          this.flightResultsList = [];
-          this.flightResultsVisible = true;
-        }
-      });
-  }
-
-  ngOnInit(): void {
-    document.addEventListener('click', () => {
-      this.dropdownOpen = false;
-    });
-  }
-
-  aiToolbarVisible = true;
-  private aiToolbarFadeTimeout: any = null;
-  showAiToolbar(): void {
-    this.aiToolbarVisible = true;
-    clearTimeout(this.aiToolbarFadeTimeout);
-  }
-  startAiToolbarFadeTimer(): void {
-    clearTimeout(this.aiToolbarFadeTimeout);
-    this.aiToolbarFadeTimeout = setTimeout(() => {
-      this.aiToolbarVisible = false;
-    }, 100);
-  }
-
-  legendVisible = false;
-  toggleLegend(): void {
-    this.legendVisible = !this.legendVisible;
-  }
-
+  /* RAUS */
   dropdownOpen = false;
   recommendationsList: {
     city: string;
@@ -363,43 +350,9 @@ export class MapComponent implements AfterViewInit, OnInit {
     type: string;
   }[] = [];
 
+  /* RAUS */
   flyToRecommendation(rec: { lat: number; lon: number }): void {
     this.map.setView([rec.lat, rec.lon], 10);
     this.dropdownOpen = false;
-  }
-
-  flyToLocation(event: any): void {
-    const index = event.target.value;
-    const allLocations = this.getAllDropdownLocations();
-    const loc = allLocations[index];
-    if (loc) this.map.setView([loc.lat, loc.lon], 10);
-  }
-
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.dropdownOpen = !this.dropdownOpen;
-  }
-
-  getAllDropdownLocations(): { label: string, lat: number, lon: number }[] {
-    const visited = this.selectedLocations.map(loc => ({
-      label: `${loc.city}, ${loc.country}`,
-      lat: loc.lat,
-      lon: loc.lon
-    }));
-
-    const wishlist = this.allMarkers
-      .filter(m => m.type === 'wishlist')
-      .map(m => {
-        const latLng = m.marker.getLatLng();
-        const popup = m.marker.getPopup();
-        const label = popup ? popup.getContent()?.toString() : `Wunschort`;
-        return {
-          label: `★ ${label}`,
-          lat: latLng.lat,
-          lon: latLng.lng
-        };
-      });
-
-    return [...visited, ...wishlist];
   }
 }
