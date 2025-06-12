@@ -13,8 +13,4 @@ describe('AppComponent', () => {
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
   });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> e7e110172cb14417fcb1f62aeee2473ddf3e1362
