@@ -1,16 +1,57 @@
 /* You can add global styles to this file, and also import other style files */
 
- :root {
-	--navbar-bg: rgba(255, 255, 255, 0.8);
-	--navbar-link: #555555;
-	--navbar-link-hover: #333333;
-	--navbar-link-active-bg: #007bff;
-	--navbar-link-active-color: #ffffff;
-	--navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+:root {
+  /*
+  --navbar-bg: #f0f0f0; /* Hintergrundfarbe der Navbar
+  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --navbar-link: #333;
+  --navbar-link-color-hover: #007bff;
+  --navbar-link-active-bg: #007bff;
+  --navbar-link-active-color: #fff;
+  */
+
+  /* Grau */
+  --shadow: rgba(0,0,0,0.3);
+  --black-st: rgba(30, 30, 30, 0.75);
+  --black: #1a1a1a;
+  --gray1: #1c1c1e;
+  --gray2: #2c2c2e;
+  --gray3: #3a3a3c;
+  --gray4: #636366;
+  --gray5: #8e8e93;
+  --gray6: #c7c7cc;
+  --gray7: #e5e5ea;
+  --white: #f6f6fa;
+  --white-st: rgba(255, 255, 255, 0.6);
+
+  /* Blau */
+  --blue1: #002c4d;
+  --blue2: #003d7a;
+  --blue3: #0051a8;
+  --blue4: #007aff;
+  --blue5: #5ac8fa;
+  --blue6: #a0ddfb;
+  --blue7: #d0f0ff;
+
+  --green-dark:  #0a7029;
+  --green:       #34c759;
+  --green-light: #a8e6a3;
+
+  /* Signalfarben Rot */
+  --red-dark:    #7a001f;
+  --red:         #ff3b30;
+  --red-light:   #ffb3ab;
+
+  /* Signalfarben Gelb */
+  --yellow-dark: #a37500;
+  --yellow:      #ffcc00;
+  --yellow-light:#fff4b8;
 }
 
 html, body {
     height: 100%;
+    width: 100%;
     margin: 0;
     padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
   }

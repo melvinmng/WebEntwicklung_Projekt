@@ -1,0 +1,41 @@
+.navbar {
+	position: absolute;
+	top: 0.5rem;
+	left: 1rem;
+	right: 1rem;
+	display: flex;
+	justify-content: space-evenly;
+	font-weight: bold;
+	background-color: var(--white);
+	padding: 0.5rem 0;
+	border-radius: 100rem;
+	box-shadow: var(--navbar-shadow);
+	z-index: 1000;
+
+	backdrop-filter: blur(3px);
+  	-webkit-backdrop-filter: blur(3px); /* Safari Support */
+  	border: 1px solid var(--white);
+}
+
+.navbar a {
+	color: var(--gray4);
+	text-decoration: none;
+	flex: 1;
+	text-align: center;
+	padding: 0.5rem;
+}
+
+.navbar a:hover {
+	color: var(--gray1);
+}
+
+@media (max-width: 600px) {
+	.navbar a {
+		font-size: 0.8rem;
+	}
+}
+
+.navbar a.active {
+	color: var(--gray1);
+	border-radius: 0.25rem;
+}

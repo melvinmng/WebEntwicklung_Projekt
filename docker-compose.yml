@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  api-service:
+    build:
+      context: world-app/backend/api-service
+    ports:
+      - "5001:5000"
+
+  auth-service:
+    build:
+      context: world-app/backend/auth-service
+    ports:
+      - "5002:5002"
+    
+  flight-service:
+    build:
+      context: world-app/backend/flight-service
+    ports:
+      - "5003:5003"
+
+  frontend:
+    build:
+      context: ./world-app
+    ports:
+      - "4200:80"
+    depends_on:
+      - api-service
+      - auth-service

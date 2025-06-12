@@ -1,5 +1,11 @@
 import { Routes } from '@angular/router';
+import { LoginComponent } from './app/pages/login/login.component';
+import { RegisterComponent } from './app/pages/register/register.component';
+import { MapComponent } from './app/pages/map/map.component';
 
 export const routes: Routes = [
-  // Deine bestehenden Routen
+  { path: '', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'map', component: MapComponent },
+  { path: '**', redirectTo: '' }
 ];

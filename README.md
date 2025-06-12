@@ -1,45 +1,22 @@
-# Personalized Travel Recommendation System
+# World App – Projekt starten & stoppen
 
+## Projekt starten
 
-## Backend Setup (Flask + Gemini)
-
-1. `.env` Datei im Verzeichnis `world-app/backend/` erstellen:
-```
-GEMINI_API_KEY=dein_gemini_api_key
-```
-
-2. Docker-Image bauen:
 ```bash
-cd world-app/backend
-docker build -t flask-gemini-backend .
+docker compose up --build
 ```
 
-3. Container starten:
+## Projekt stoppen
+
 ```bash
-docker run -p 5001:5000 flask-gemini-backend
+docker compose down
 ```
 
+## Zugriff auf die App
 
-## Frontend Setup (Angular)
+- **Frontend**: [http://localhost](http://localhost:4200)
+- **API-Service**: [http://localhost:5000](http://localhost:5000)
+- **Auth-Service**: [http://localhost:5002](http://localhost:5002)
+- **Flight-Service**: [http://localhost:5003](http://localhost:5003)
 
-1. Repository klonen
-```bash
-git clone https://github.com/melvinmng/WebEntwicklung_Projekt.git
-cd WebEntwicklung_Projekt/world-app
-```
-
-2. Abhängigkeiten installieren
-```bash
-npm install
-```
-
-3. App starten
-```bash
-npm start
-# oder
-ng serve
-```
-4. Öffne den Link aus dem Terminal im Browser.
-
-
-
+> Stelle sicher, dass du im Projekt-Root arbeitest – dort, wo die `docker-compose.yml` liegt.

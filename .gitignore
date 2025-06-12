@@ -1,4 +1,5 @@
 .venv
+.env
 
 # Node modules (Frontend)
 node_modules/
@@ -8,8 +9,7 @@ dist/
 out-tsc/
 
 # Environment config (Backend)
-world-app/backend/.env
-
+world-app/backend/api-service/.env
 
 # Python cache
 __pycache__/
