@@ -62,5 +62,6 @@
 
 <!-- Buchungsseite -->
  <div class="booking-overlay" *ngIf="bookingVisible" (click)="closeBookingOverlay()">
+    <p> {{ flightBookingURL }}</p>
     <iframe class="booking-iframe" [src]="flightBookingURL"></iframe>
 </div>
