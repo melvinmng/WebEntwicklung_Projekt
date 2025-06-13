@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
 
 import { MapComponent } from '../map/map.component';
 
@@ -13,7 +15,7 @@ import { MapComponent } from '../map/map.component';
   styleUrl: './flight-search.component.css'
 })
 export class FlightSearchComponent {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   /* RAUS */
   // ----- Flight search -----
@@ -26,6 +28,7 @@ export class FlightSearchComponent {
   flightAdults = 1;
   flightChildren = 0;
   flightBookingURL = '';
+  flightBookingURLSafe: SafeResourceUrl | '' = '';
   flightResults: any = null;
   flightResultsVisible = false;
   flightResultsList: any[] = [];
@@ -102,25 +105,31 @@ export class FlightSearchComponent {
       });
   }
 
+  // ----- Booking URL -----
   getFlightBookingURL(): string {
     return `https://www.expedia.com/Flights-Search?flight-type=on&mode=search&trip=${this.flightTrip}&leg1=from:${this.flightOrigin},to:${this.flightDestination},departure:${this.flightDate}TANYT,fromType:AIRPORT,toType:AIRPORT&options=cabinclass:${this.flightSeat}&fromDate=${this.flightDate}&passengers=children:${this.flightChildren}[7],adults:${this.flightAdults},infantinlap:N`;
   }
 
+  // ----- Redirect to Booking Page -----
   openBookingPage(): void {
     this.flightBookingURL = this.getFlightBookingURL();
     window.open(this.flightBookingURL, '_blank');
   }
 
+  // ----- Booking overlay -----
   openBookingOverlay(): void {
     this.flightFormVisible = false;
     this.flightResultsVisible = false;
     this.bookingVisible = true;
-    this.flightBookingURL = this.getFlightBookingURL();
+    const url = this.getFlightBookingURL();
+    this.flightBookingURL = url;
+    this.flightBookingURLSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   closeBookingOverlay(): void {
     this.bookingVisible = false;
     this.flightFormVisible = true;
     this.flightResultsVisible = true;
+    this.flightBookingURLSafe = '';
   }
 }
