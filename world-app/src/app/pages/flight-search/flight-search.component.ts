@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -34,6 +35,27 @@ export class FlightSearchComponent {
   flightResultsList: any[] = [];
   flightError = '';
   bookingVisible = false;
+
+  onTwoPinsSelected(event: { origin: string; destination: string }): void {
+    console.log('EVENT ANGekommen:', event);
+    const originReq = this.http.get<{ airports: string[] }>(
+      `http://localhost:5003/search-airport?query=${encodeURIComponent(event.origin)}`
+    );
+    const destReq = this.http.get<{ airports: string[] }>(
+      `http://localhost:5003/search-airport?query=${encodeURIComponent(event.destination)}`
+    );
+
+    forkJoin([originReq, destReq]).subscribe(([o, d]) => {
+      this.flightOrigin = o.airports[0] || '';
+      this.flightDestination = d.airports[0] || '';
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      this.flightDate = date.toISOString().split('T')[0];
+      if (this.flightOrigin && this.flightDestination) {
+        this.openFlightSearch();
+      }
+    });
+  }
 
   openFlightSearch(): void {
     console.log('openFlightSearch aufgerufen');

@@ -1,5 +1,5 @@
 <div class="container">
-    <app-map></app-map>
+    <app-map (twoPinsSelected)="onTwoPinsSelected($event)"></app-map>
     <button (click)="openFlightSearch()">Flüge finden</button>
 
     <!-- Flug-Suchformular -->

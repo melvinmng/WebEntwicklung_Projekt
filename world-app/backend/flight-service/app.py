@@ -1,6 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from fast_flights import FlightData, Passengers, Result, get_flights as fetch_flights
+from fast_flights import (
+    FlightData,
+    Passengers,
+    Result,
+    get_flights as fetch_flights,
+    search_airport,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -45,6 +51,16 @@ def flights():
         return jsonify(result)
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 404
+
+
+@app.route("/search-airport", methods=["GET"])
+def airport():
+    query = request.args.get("query", "")
+    if not query:
+        return jsonify({"error": "query parameter required"}), 400
+
+    airports = search_airport(query)
+    return jsonify({"airports": [a.value for a in airports]})
 
 
 if __name__ == "__main__":

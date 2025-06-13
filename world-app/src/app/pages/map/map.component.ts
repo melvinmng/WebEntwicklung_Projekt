@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
@@ -22,6 +22,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 })
 export class MapComponent implements AfterViewInit, OnInit {
   @ViewChild(AiToolbarComponent) aiToolbarComponent!: AiToolbarComponent;
+  @Output() twoPinsSelected = new EventEmitter<{ origin: string; destination: string }>();
 
   public map!: L.Map;
   private countries = countries;
@@ -134,7 +135,16 @@ export class MapComponent implements AfterViewInit, OnInit {
       const city = data.city || 'Unbekannt';
       const country = data.country || 'Unbekannt';
       const exists = this.selectedLocations.some(loc => loc.lat === lat && loc.lon === lon);
-      if (!exists) this.selectedLocations.push({ city, country, lat, lon });
+      if (!exists) {
+        this.selectedLocations.push({ city, country, lat, lon });
+        if (this.selectedLocations.length === 2) {
+          const [a, b] = this.selectedLocations;
+          if (a.city !== 'Unbekannt' && b.city !== 'Unbekannt') {
+            console.log('Emitte jetzt:', a.city, b.city);
+            this.twoPinsSelected.emit({ origin: a.city, destination: b.city });
+          }
+        }
+      }
     });
   }
 
