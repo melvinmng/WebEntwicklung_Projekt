@@ -77,11 +77,9 @@ export class FlightSearchComponent {
   }
 
   closeFlightSearch(): void {
+    this.resetFlightSearch();
     this.flightFormVisible = false;
-    this.flightResults = null;
     this.flightResultsVisible = false;
-    this.flightResultsList = [];
-    this.flightError = '';
   }
 
   resetFlightSearch(): void {
@@ -96,6 +94,8 @@ export class FlightSearchComponent {
     this.flightResultsVisible = false;
     this.flightResultsList = [];
     this.flightError = '';
+    this.bookingError = '';
+    this.formErrors = { origin: false, destination: false, date: false };
     this.bookingVisible = false;
     this.flightFormVisible = true;
   }
