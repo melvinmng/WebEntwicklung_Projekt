@@ -84,7 +84,7 @@ app-map {
   padding: 20px;
   border-radius: 1em;
   width: 320px;
-  max-height: 600px;
+  max-height: 650px;
   overflow-y: auto;
   box-shadow: 0 8px 24px var(--shadow);
 }
@@ -145,7 +145,7 @@ app-map {
   padding: 20px;
   border-radius: 1em;
   width: 320px;
-  max-height: 600px;
+  max-height: 650px;
   overflow-y: auto;
   box-shadow: 0 8px 24px var(--shadow);
 }
@@ -189,4 +189,17 @@ app-map {
 .flight-error {
   color: var(--red);
   margin-bottom: 10px;
+}
+
+.input-error {
+  border-color: var(--red);
+  animation: shake 0.3s;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
 }

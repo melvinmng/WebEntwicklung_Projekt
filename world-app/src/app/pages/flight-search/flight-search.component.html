@@ -8,13 +8,19 @@
             <div class="flight-search-box">
             <form (ngSubmit)="searchFlights()">
             <label>Von
-                <input [(ngModel)]="flightOrigin" name="origin" required />
+                <input [(ngModel)]="flightOrigin" name="origin" required
+                       (ngModelChange)="clearError('origin')"
+                       [ngClass]="{ 'input-error': formErrors.origin }" />
             </label>
             <label>Nach
-                <input [(ngModel)]="flightDestination" name="destination" required />
+                <input [(ngModel)]="flightDestination" name="destination" required
+                       (ngModelChange)="clearError('destination')"
+                       [ngClass]="{ 'input-error': formErrors.destination }" />
             </label>
             <label>Datum
-                <input type="date" [(ngModel)]="flightDate" name="date" required />
+                <input type="date" [(ngModel)]="flightDate" name="date" required
+                       (ngModelChange)="clearError('date')"
+                       [ngClass]="{ 'input-error': formErrors.date }" />
             </label>
             <label>Reiseart
                 <select [(ngModel)]="flightTrip" name="trip">
@@ -35,6 +41,7 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
+            <div *ngIf="bookingError" class="flight-error">{{ bookingError }}</div>
             <button type="submit">Suchen</button>
             <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
             <button type="button" (click)="resetFlightSearch()">Zurücksetzen</button>

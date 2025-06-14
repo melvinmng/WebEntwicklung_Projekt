@@ -35,6 +35,19 @@ export class FlightSearchComponent {
   flightResultsList: any[] = [];
   flightError = '';
   bookingVisible = false;
+  bookingError = '';
+  formErrors = { origin: false, destination: false, date: false };
+
+  validateBookingFields(): boolean {
+    this.formErrors.origin = !this.flightOrigin;
+    this.formErrors.destination = !this.flightDestination;
+    this.formErrors.date = !this.flightDate;
+    return !(this.formErrors.origin || this.formErrors.destination || this.formErrors.date);
+  }
+
+  clearError(field: 'origin' | 'destination' | 'date'): void {
+    this.formErrors[field] = false;
+  }
 
   onTwoPinsSelected(event: { origin: string; destination: string }): void {
     console.log('EVENT ANGekommen:', event);
@@ -93,7 +106,11 @@ export class FlightSearchComponent {
   
 
   searchFlights(): void {
-    if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
+    if (!this.validateBookingFields()) {
+      this.bookingError = 'Bitte alle Pflichtfelder ausfüllen';
+      return;
+    }
+    this.bookingError = '';
     const params = new URLSearchParams({
       from_airport: this.flightOrigin,
       to_airport: this.flightDestination,
@@ -134,6 +151,11 @@ export class FlightSearchComponent {
 
   // ----- Redirect to Booking Page -----
   openBookingPage(): void {
+    if (!this.validateBookingFields()) {
+      this.bookingError = 'Bitte alle Pflichtfelder ausfüllen';
+      return;
+    }
+    this.bookingError = '';
     this.flightBookingURL = this.getFlightBookingURL();
     window.open(this.flightBookingURL, '_blank');
   }
