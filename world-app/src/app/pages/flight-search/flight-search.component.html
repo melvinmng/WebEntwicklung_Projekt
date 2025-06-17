@@ -11,13 +11,13 @@
                 <input [(ngModel)]="flightOrigin" name="origin" required
                        (ngModelChange)="clearError('origin')"
                        [ngClass]="{ 'input-error': formErrors.origin }" 
-                       placeholder="hier IATA-Code eintragen"/>
+                       placeholder="Hier IATA-Code eintragen"/>
             </label>
             <label>Nach
                 <input [(ngModel)]="flightDestination" name="destination" required
                        (ngModelChange)="clearError('destination')"
                        [ngClass]="{ 'input-error': formErrors.destination }" 
-                       placeholder="hier IATA-Code eintragen"/>
+                       placeholder="Hier IATA-Code eintragen"/>
             </label>
             <label>Datum
                 <input type="date" [(ngModel)]="flightDate" name="date" required
