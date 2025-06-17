@@ -21,11 +21,17 @@ export class LoginComponent {
   constructor(private http: HttpClient, private router: Router) {}
 
   login() {
-    this.http.post('http://localhost:5002/login', {
+    this.http.post<any>('http://localhost:5002/login', {
       username: this.username,
       password: this.password
     }).subscribe({
-      next: () => this.router.navigate(['/map']),
+      next: () => {
+        // 🧠 Benutzername speichern für spätere Nutzung
+        localStorage.setItem('username', this.username);
+  
+        // 🔀 Weiterleitung zur Karte
+        this.router.navigate(['/map']);
+      },
       error: (err) => {
         this.errorMessage = err?.error?.error || 'Login fehlgeschlagen';
       }
