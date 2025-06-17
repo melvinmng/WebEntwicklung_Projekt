@@ -1,0 +1,54 @@
+.account-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+ }
+
+ .account-card {
+  background: var(--white);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px var(--shadow);
+  max-width: 500px;
+  width: 100%;
+ }
+
+ .account-card h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+ }
+
+ .account-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+ }
+
+ .account-card input,
+ .account-card textarea {
+  padding: 10px;
+  border: 1px solid var(--gray5);
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+ }
+
+ .account-card button {
+  padding: 10px;
+  background-color: var(--blue4);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+ }
+
+ .account-card button:hover {
+  background-color: var(--blue3);
+ }
+
+ .message {
+  color: var(--green);
+  font-size: 14px;
+ }

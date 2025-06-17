@@ -1,1 +1,37 @@
-<p>account-management works!</p>
+<div class="account-wrapper">
+  <div class="account-card">
+    <h2>Account verwalten</h2>
+
+    <label class="username-label">
+      Aktueller Benutzername:
+      <input [(ngModel)]="username" name="username" />
+    </label>
+
+    <section>
+      <h3>Nutzername ändern</h3>
+      <form (ngSubmit)="changeUsername()">
+        <input [(ngModel)]="newUsername" name="newUsername" placeholder="Neuer Benutzername" required />
+        <button type="submit">Aktualisieren</button>
+      </form>
+      <p *ngIf="messageUser" class="message">{{ messageUser }}</p>
+    </section>
+
+    <section>
+      <h3>Passwort ändern</h3>
+      <form (ngSubmit)="changePassword()">
+        <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Neues Passwort" required />
+        <button type="submit">Aktualisieren</button>
+      </form>
+      <p *ngIf="messagePassword" class="message">{{ messagePassword }}</p>
+    </section>
+
+    <section>
+      <h3>Individueller Gemini Prompt</h3>
+      <form (ngSubmit)="savePrompt()">
+        <textarea [(ngModel)]="prompt" name="prompt" placeholder="Dein Prompt"></textarea>
+        <button type="submit">Speichern</button>
+      </form>
+      <p *ngIf="messagePrompt" class="message">{{ messagePrompt }}</p>
+    </section>
+  </div>
+</div>
