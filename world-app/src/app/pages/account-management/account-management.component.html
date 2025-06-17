@@ -2,10 +2,10 @@
   <div class="account-card">
     <h2>Account verwalten</h2>
 
-    <label class="username-label">
-      Aktueller Benutzername:
-      <input [(ngModel)]="username" name="username" />
-    </label>
+    <p class="current-user">
+      <strong>Aktueller Benutzername:</strong>
+      <span>{{ username }}</span>
+    </p>
 
     <section>
       <h3>Nutzername ändern</h3>
@@ -19,6 +19,7 @@
     <section>
       <h3>Passwort ändern</h3>
       <form (ngSubmit)="changePassword()">
+        <input type="password" [(ngModel)]="currentPassword" name="currentPassword" placeholder="Aktuelles Passwort" required />
         <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Neues Passwort" required />
         <button type="submit">Aktualisieren</button>
       </form>

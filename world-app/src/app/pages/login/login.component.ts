@@ -25,7 +25,10 @@ export class LoginComponent {
       username: this.username,
       password: this.password
     }).subscribe({
-      next: () => this.router.navigate(['/map']),
+      next: () => {
+        localStorage.setItem('currentUser', this.username);
+        this.router.navigate(['/map']);
+      },
       error: (err) => {
         this.errorMessage = err?.error?.error || 'Login fehlgeschlagen';
       }

@@ -46,13 +46,23 @@ def login():
 def change_password():
     data = request.json
     username = data.get("username")
+    current_password = data.get("current_password")
     new_password = data.get("new_password")
 
-    if not username or not new_password:
-        return jsonify({"error": "username und new_password erforderlich"}), 400
+    if not username or not current_password or not new_password:
+        return (
+            jsonify(
+                {"error": "username, current_password und new_password erforderlich"}
+            ),
+            400,
+        )
 
     if not user_exists(username):
         return jsonify({"error": "Benutzer nicht gefunden"}), 404
+
+    stored_hash = get_password_hash(username)
+    if not stored_hash or not verify_password(current_password, stored_hash):
+        return jsonify({"error": "Aktuelles Passwort ist falsch"}), 401
 
     success = update_user(username, {"PASSWORD": hash_password(new_password)})
     if success:

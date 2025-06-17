@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -10,9 +10,10 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './account-management.component.html',
   styleUrl: './account-management.component.css'
 })
-export class AccountManagementComponent {
-username = '';
+export class AccountManagementComponent implements OnInit {
+  username = '';
   newUsername = '';
+  currentPassword = '';
   newPassword = '';
   prompt = '';
 
@@ -21,6 +22,13 @@ username = '';
   messagePrompt = '';
 
   constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    const stored = localStorage.getItem('currentUser');
+    if (stored) {
+      this.username = stored;
+    }
+  }
 
   changeUsername() {
     this.http.patch('http://localhost:5002/change-username', {
@@ -37,6 +45,7 @@ username = '';
   changePassword() {
     this.http.patch('http://localhost:5002/change-password', {
       username: this.username,
+      current_password: this.currentPassword,
       new_password: this.newPassword
     }).subscribe({
       next: () => this.messagePassword = 'Passwort aktualisiert',
