@@ -91,7 +91,7 @@ def get_airport_code():
         return jsonify({"error": "Kein Flughafen gefunden!"}), 404
 
     # Optional: Wenn mehrere gefunden, gib alle zurück
-    iata_codes = [entry["iata"] for entry in data]
+    iata_codes = [entry["iata_code"] for entry in data]
     return jsonify({"iata_codes": iata_codes})
 
 
@@ -119,7 +119,9 @@ if __name__ == "__main__":
         print("error: Kein Flughafen gefunden!")
 
     # Optional: Wenn mehrere gefunden, gib alle zurück
-    iata_codes = [entry["iata"] for entry in data]
+    iata_codes = [entry["iata_code"] for entry in data]
 
     for entry in iata_codes:
         print(entry)
+
+    print(response.json())
