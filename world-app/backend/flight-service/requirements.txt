@@ -3,3 +3,4 @@ flask-cors
 fast-flights
 playwright
 dotenv
+requests

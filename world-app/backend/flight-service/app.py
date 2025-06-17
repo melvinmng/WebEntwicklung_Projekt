@@ -12,7 +12,7 @@ import os
 import requests
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:4200"])
 
 load_dotenv()
 
