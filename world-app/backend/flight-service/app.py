@@ -98,30 +98,30 @@ def get_airport_code():
 # Beispielaufruf: /airport_code?name=Frankfurt
 
 if __name__ == "__main__":
-    # app.run(host="0.0.0.0", port=5003)
-    name = "Baden-Baden"
-    if not name:
-        print("error: 'Bitte Parameter name angeben!")
+    app.run(host="0.0.0.0", port=5003)
+    # name = "Baden-Baden"
+    # if not name:
+    #     print("error: 'Bitte Parameter name angeben!")
 
-    # Supabase REST-API Query bauen
-    url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
-    headers = {
-        "apikey": SUPABASE_API_KEY,
-        "Authorization": f"Bearer {SUPABASE_API_KEY}",
-    }
+    # # Supabase REST-API Query bauen
+    # url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
+    # headers = {
+    #     "apikey": SUPABASE_API_KEY,
+    #     "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    # }
 
-    response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-        print((f"error: Fehler beim Supabase-Request!, details: {response.text}"))
+    # response = requests.get(url, headers=headers)
+    # if response.status_code != 200:
+    #     print((f"error: Fehler beim Supabase-Request!, details: {response.text}"))
 
-    data = response.json()
-    if not data:
-        print("error: Kein Flughafen gefunden!")
+    # data = response.json()
+    # if not data:
+    #     print("error: Kein Flughafen gefunden!")
 
-    # Optional: Wenn mehrere gefunden, gib alle zurück
-    iata_codes = [entry["iata_code"] for entry in data]
+    # # Optional: Wenn mehrere gefunden, gib alle zurück
+    # iata_codes = [entry["iata_code"] for entry in data]
 
-    for entry in iata_codes:
-        print(entry)
+    # for entry in iata_codes:
+    #     print(entry)
 
-    print(response.json())
+    # print(response.json())
