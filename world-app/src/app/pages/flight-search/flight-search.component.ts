@@ -18,7 +18,6 @@ import { MapComponent } from '../map/map.component';
 export class FlightSearchComponent {
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
-  /* RAUS */
   // ----- Flight search -----
   flightFormVisible = false;
   flightOrigin = '';
