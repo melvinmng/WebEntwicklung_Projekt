@@ -5,11 +5,15 @@ from fast_flights import (
     Passengers,
     Result,
     get_flights as fetch_flights,
-    search_airport,
+    search_airport,  # not working correctly, using DB instead
 )
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
+
+load_dotenv()
 
 
 @app.route("/flight-search", methods=["GET"])
@@ -53,8 +57,13 @@ def flights():
         return jsonify({"error": str(e)}), 404
 
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+TABLE_NAME = "airports"
+
+
 @app.route("/search-airport", methods=["GET"])
-def airport():
+def search_airport():
     query = request.args.get("query", "")
     if not query:
         return jsonify({"error": "query parameter required"}), 400
