@@ -46,6 +46,7 @@
             </label>
             <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>
             <div *ngIf="foundIataCodes.length">Gefundene Codes: {{ foundIataCodes.join(', ') }}</div>
+            <div *ngIf="iataSearchError" class="flight-error">{{ iataSearchError }}</div>
             <div *ngIf="bookingError" class="flight-error">{{ bookingError }}</div>
             <button type="submit">Suchen</button>
             <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>

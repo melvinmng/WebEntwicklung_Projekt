@@ -38,6 +38,7 @@ export class FlightSearchComponent {
   formErrors = { origin: false, destination: false, date: false };
   foundIataCodes: string[] = [];
   airportNameSearch = '';
+  iataSearchError = '';
 
 
   validateBookingFields(): boolean {
@@ -102,6 +103,7 @@ export class FlightSearchComponent {
     this.flightFormVisible = true;
     this.foundIataCodes = [];
     this.airportNameSearch = '';
+    this.iataSearchError = '';
   }
 
   closeFlightResults(): void {
@@ -183,16 +185,21 @@ export class FlightSearchComponent {
 
   findAirportCode(name: string): void {
     const url = `http://localhost:5003/airport-code?name=${encodeURIComponent(name)}`;
+    this.iataSearchError = '';
+    this.foundIataCodes = [];
 
     this.http.get<{ iata_codes: string[] }>(url)
       .subscribe({
         next: (data) => {
+          if (data.iata_codes && data.iata_codes.length > 0) {
           this.foundIataCodes = data.iata_codes;
-          console.log('Gefundene IATA-Codes:', this.foundIataCodes);
-        },
+        } else {
+          this.iataSearchError = 'Kein Flughafen gefunden';
+        }
+      },
         error: (err) => {
-          this.foundIataCodes = [];
-          console.error('Fehler beim Abrufen der Flughafencodes:', err);
+        console.error('Fehler beim Abrufen der Flughafencodes:', err);
+        this.iataSearchError = 'Fehler beim Abrufen der Flughafencodes';
         }
       });
   }
