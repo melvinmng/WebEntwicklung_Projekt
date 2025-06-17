@@ -37,6 +37,8 @@ export class FlightSearchComponent {
   bookingError = '';
   formErrors = { origin: false, destination: false, date: false };
   foundIataCodes: string[] = [];
+  airportNameSearch = '';
+
 
   validateBookingFields(): boolean {
     this.formErrors.origin = !this.flightOrigin;
@@ -99,6 +101,7 @@ export class FlightSearchComponent {
     this.bookingVisible = false;
     this.flightFormVisible = true;
     this.foundIataCodes = [];
+    this.airportNameSearch = '';
   }
 
   closeFlightResults(): void {
