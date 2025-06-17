@@ -19,12 +19,11 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 })
 export class AiToolbarComponent implements AfterViewInit, OnInit {
   @Input() map!: L.Map;
+  @Input() selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
+  @Input() allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
+  @Input() removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   private countries = countries;
-  public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   public recommendations: string = '';
-
-  private allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
-  private removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
 

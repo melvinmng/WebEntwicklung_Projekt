@@ -29,7 +29,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   public recommendations: string = '';
   public allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
-  private removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
+  public removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
   public markerVisibility: Record<MarkerType, boolean> = {
