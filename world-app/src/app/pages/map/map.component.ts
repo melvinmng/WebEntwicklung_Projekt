@@ -39,11 +39,8 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     hidden: true,
     wishlist: true
   };
-  private isMouseDown = false;
-  private hasMoved = false;
   private username: string = localStorage.getItem('username') || '';
   private suppressSync = false;
-  private isDragging = false;
 
   constructor(private http: HttpClient) {}
 
@@ -119,6 +116,9 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
       this.getWishlistLocationDetails(e.latlng.lat, e.latlng.lng);
     });
+
+    // provide map instance to the toolbar component
+    this.aiToolbarComponent.map = this.map;
   }
 
   private addMapButtons(): void {

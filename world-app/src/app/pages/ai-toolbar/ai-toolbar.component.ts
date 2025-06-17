@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
@@ -18,7 +18,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   imports: [CommonModule, HttpClientModule, FormsModule]
 })
 export class AiToolbarComponent implements AfterViewInit, OnInit {
-  private map!: L.Map;
+  @Input() map!: L.Map;
   private countries = countries;
   public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   public recommendations: string = '';
@@ -39,7 +39,6 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
   constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
-    this.initMap();
     const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
     if (mapContainer) {
       const controlGroup = document.createElement('div');
@@ -85,42 +84,6 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
     }
   }
 
-  private initMap(): void {
-    this.map = L.map('map', {
-      center: [35, 0],
-      zoom: 2,
-      minZoom: 2,
-      maxZoom: 18,
-      maxBounds: [[-85, -180], [85, 180]],
-      maxBoundsViscosity: 1.0,
-      zoomControl: false // Standard-Zoom-Control deaktivieren
-    });
-
-	L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(this.map);
-
-    L.geoJSON(this.countries, {
-      style: { color: 'blue', weight: 1, fillOpacity: 0.1 }
-    }).addTo(this.map);
-
-    this.map.on('click', (e: L.LeafletMouseEvent) => {
-      const target = e.originalEvent.target as HTMLElement;
-      if (target.closest('.leaflet-custom-button')) return;
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
-      this.addMarker(lat, lon, 'user');
-      this.getLocationDetails(lat, lon);
-    });
-
-    this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
-      this.getWishlistLocationDetails(lat, lon);
-    });
-  }
 
   private getLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
