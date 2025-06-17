@@ -3,7 +3,7 @@
 <!-- Karte -->
 <div id="map"></div>
 <app-navbar></app-navbar>
-<app-ai-toolbar></app-ai-toolbar>
+<app-ai-toolbar [map]="map"></app-ai-toolbar>
 <!-- Legenden-Toggle-Button -->
 <div class="legend-toggle" (click)="toggleLegend()">Legende</div>
 
