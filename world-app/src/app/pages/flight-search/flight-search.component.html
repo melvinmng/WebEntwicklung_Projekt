@@ -41,6 +41,11 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
+            <label>Flughafenname
+                <input [(ngModel)]="airportNameSearch" name="airportNameSearch" />
+            </label>
+            <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>
+            <div *ngIf="foundIataCodes.length">Gefundene Codes: {{ foundIataCodes.join(', ') }}</div>
             <div *ngIf="bookingError" class="flight-error">{{ bookingError }}</div>
             <button type="submit">Suchen</button>
             <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
