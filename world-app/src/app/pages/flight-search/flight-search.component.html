@@ -10,12 +10,14 @@
             <label>Von
                 <input [(ngModel)]="flightOrigin" name="origin" required
                        (ngModelChange)="clearError('origin')"
-                       [ngClass]="{ 'input-error': formErrors.origin }" />
+                       [ngClass]="{ 'input-error': formErrors.origin }" 
+                       placeholder="hier IATA-Code eintragen"/>
             </label>
             <label>Nach
                 <input [(ngModel)]="flightDestination" name="destination" required
                        (ngModelChange)="clearError('destination')"
-                       [ngClass]="{ 'input-error': formErrors.destination }" />
+                       [ngClass]="{ 'input-error': formErrors.destination }" 
+                       placeholder="hier IATA-Code eintragen"/>
             </label>
             <label>Datum
                 <input type="date" [(ngModel)]="flightDate" name="date" required
@@ -41,8 +43,9 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
-            <label>Flughafenname (falls IATA-Code nicht bekannt)
-                <input [(ngModel)]="airportNameSearch" name="airportNameSearch" />
+            <label>Flughafen- bzw. Städtename (falls IATA-Code nicht bekannt)
+                <input [(ngModel)]="airportNameSearch" name="airportNameSearch" 
+                placeholder="z. B. Stuttgart"/>
             </label>
             <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>
             <div *ngIf="foundIataCodes.length">Gefundene Codes: {{ foundIataCodes.join(', ') }}</div>
