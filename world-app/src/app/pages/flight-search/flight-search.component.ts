@@ -182,7 +182,7 @@ export class FlightSearchComponent {
   }
 
   findAirportCode(name: string): void {
-    const url = `http://localhost:5003/airport_code?name=${encodeURIComponent(name)}`;
+    const url = `http://localhost:5003/airport-code?name=${encodeURIComponent(name)}`;
 
     this.http.get<{ iata_codes: string[] }>(url)
       .subscribe({

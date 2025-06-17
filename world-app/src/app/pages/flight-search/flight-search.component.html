@@ -41,7 +41,7 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
-            <label>Flughafenname
+            <label>Flughafenname (falls IATA-Code nicht bekannt)
                 <input [(ngModel)]="airportNameSearch" name="airportNameSearch" />
             </label>
             <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>
