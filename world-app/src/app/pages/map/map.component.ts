@@ -289,10 +289,10 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   clearLocations(): void {
-    this.selectedLocations = [];
+    this.selectedLocations.length = 0;
     this.allMarkers.forEach(m => m.marker.remove());
-    this.allMarkers = [];
-    this.removedMarkersStack = [];
+    this.allMarkers.length = 0;
+    this.removedMarkersStack.length = 0;
     this.syncToDatabase();
   }
 
