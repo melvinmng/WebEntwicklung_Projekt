@@ -7,8 +7,9 @@ from fast_flights import (
     get_flights as fetch_flights,
     search_airport,  # not working correctly, using DB instead
 )
-import os
 from dotenv import load_dotenv
+import os
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -62,15 +63,63 @@ SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
 TABLE_NAME = "airports"
 
 
-@app.route("/search-airport", methods=["GET"])
-def search_airport():
-    query = request.args.get("query", "")
-    if not query:
-        return jsonify({"error": "query parameter required"}), 400
+@app.route("/airport_code", methods=["GET"])
+def get_airport_code():
+    # Namen aus den Request-Parametern holen (z. B. ?name=Frankfurt)
+    name = request.args.get("name")
+    if not name:
+        return jsonify({"error": 'Bitte Parameter "name" angeben!'}), 400
 
-    airports = search_airport(query)
-    return jsonify({"airports": [a.value for a in airports]})
+    # Supabase REST-API Query bauen
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    }
 
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return (
+            jsonify(
+                {"error": "Fehler beim Supabase-Request!", "details": response.text}
+            ),
+            500,
+        )
+
+    data = response.json()
+    if not data:
+        return jsonify({"error": "Kein Flughafen gefunden!"}), 404
+
+    # Optional: Wenn mehrere gefunden, gib alle zurück
+    iata_codes = [entry["iata"] for entry in data]
+    return jsonify({"iata_codes": iata_codes})
+
+
+# Beispielaufruf: /airport_code?name=Frankfurt
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5003)
+    # app.run(host="0.0.0.0", port=5003)
+    name = "Baden-Baden"
+    if not name:
+        print("error: 'Bitte Parameter name angeben!")
+
+    # Supabase REST-API Query bauen
+    url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print((f"error: Fehler beim Supabase-Request!, details: {response.text}"))
+
+    data = response.json()
+    if not data:
+        print("error: Kein Flughafen gefunden!")
+
+    # Optional: Wenn mehrere gefunden, gib alle zurück
+    iata_codes = [entry["iata"] for entry in data]
+
+    for entry in iata_codes:
+        print(entry)
