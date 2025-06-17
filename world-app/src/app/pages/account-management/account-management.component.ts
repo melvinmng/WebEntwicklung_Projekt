@@ -35,7 +35,10 @@ export class AccountManagementComponent implements OnInit {
       username: this.username,
       new_username: this.newUsername
     }).subscribe({
-      next: () => this.messageUser = 'Benutzername aktualisiert',
+      next: () => { 
+        this.username = this.newUsername;
+        this.messageUser = 'Benutzername aktualisiert';
+      },
       error: (err) => {
         this.messageUser = err?.error?.error || 'Aktualisierung fehlgeschlagen';
       }
