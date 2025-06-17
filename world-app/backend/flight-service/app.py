@@ -63,7 +63,7 @@ SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
 TABLE_NAME = "airports"
 
 
-@app.route("/airport_code", methods=["GET"])
+@app.route("/airport-code", methods=["GET"])
 def get_airport_code():
     # Namen aus den Request-Parametern holen (z. B. ?name=Frankfurt)
     name = request.args.get("name")
