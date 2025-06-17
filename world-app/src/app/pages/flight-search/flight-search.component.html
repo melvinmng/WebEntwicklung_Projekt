@@ -6,6 +6,7 @@
     <div class="flight-search-overlay" *ngIf="flightFormVisible" (click)="closeFlightSearch()">
         <div class="flight-popup-container" (click)="$event.stopPropagation()">
             <div class="flight-search-box">
+            <h3>Flugsuche</h3>
             <form (ngSubmit)="searchFlights()">
             <label>Von
                 <input [(ngModel)]="flightOrigin" name="origin" required
@@ -62,13 +63,15 @@
             <div *ngIf="flightError" class="flight-error">{{ flightError }}</div>
             <ul class="flight-list">
                 <li *ngFor="let r of flightResultsList" class="flight-item">
-                <div class="flight-airports">
-                    {{ flightOrigin.toUpperCase() }} → {{ flightDestination.toUpperCase() }}
-                </div>
-                <div class="flight-times">
-                    {{ r.departure }} → {{ r.arrival }}
-                </div>
-                <div class="flight-price">{{ r.price }}</div>
+                <div class="flight-info">
+                        <div class="flight-airports">
+                            {{ flightOrigin.toUpperCase() }} → {{ flightDestination.toUpperCase() }}
+                        </div>
+                        <div class="flight-times">
+                            {{ r.departure }} → {{ r.arrival }}
+                        </div>
+                    </div>
+                    <div class="flight-price">{{ r.price }}</div>
                 </li>
             </ul>
             </div>

@@ -77,6 +77,8 @@ app-map {
 .flight-popup-container {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .flight-search-box {
@@ -87,6 +89,14 @@ app-map {
   max-height: 650px;
   overflow-y: auto;
   box-shadow: 0 8px 24px var(--shadow);
+}
+
+.flight-search-box h3,
+.flight-results-box h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 20px;
+  color: var(--gray1);
 }
 
 .flight-search-box form {
@@ -157,14 +167,20 @@ app-map {
 }
 
 .flight-results-box li {
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .flight-item {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--gray7);
+}
+
+.flight-info {
+  display: flex;
   flex-direction: column;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--gray5);
 }
 
 .flight-item:last-child {
@@ -182,8 +198,13 @@ app-map {
 }
 
 .flight-price {
-  font-weight: bold;
-  color: var(--blue4);
+  font-weight: 600;
+  color: var(--white);
+  background-color: var(--blue4);
+  padding: 6px 12px;
+  border-radius: 8px;
+  min-width: 80px;
+  text-align: center;
 }
 
 .flight-error {
@@ -202,4 +223,12 @@ app-map {
   50% { transform: translateX(3px); }
   75% { transform: translateX(-3px); }
   100% { transform: translateX(0); }
+}
+
+@media (max-width: 700px) {
+  .flight-search-box,
+  .flight-results-box {
+    width: 100%;
+    max-width: 420px;
+  }
 }
