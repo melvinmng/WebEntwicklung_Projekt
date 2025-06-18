@@ -188,7 +188,11 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
     this.dropdownOpen = false;
 
     const locationsParam = this.selectedLocations.map(loc => `${loc.city}, ${loc.country}`).join(',');
-    const url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
+    const username = localStorage.getItem('currentUser');
+    let url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
+    if (username) {
+      url += `&username=${encodeURIComponent(username)}`;
+    }
 
     this.http.get<any>(url).subscribe(response => {
       const recs = response.recommendations;

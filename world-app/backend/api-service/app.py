@@ -16,9 +16,22 @@ app = Flask(__name__)
 CORS(app)
 
 
+def get_user_prompt(username: str) -> str:
+    """Fetch custom prompt for the user from the DB service."""
+    try:
+        res = requests.get(f"http://localhost:5004/api/db-read/USER/{username}")
+        if res.status_code == 200:
+            data = res.json()
+            return data.get("PROMPT", "") or ""
+    except Exception:
+        pass
+    return ""
+
+
 @app.route("/api/recommendations", methods=["GET"])
 def recommendations():
     locations = request.args.get("locations", "")
+    username = request.args.get("username")
     if not locations:
         return (
             jsonify(
@@ -30,10 +43,10 @@ def recommendations():
         )
 
     location_list = [loc.strip() for loc in locations.split(",") if loc.strip()]
-
     formatted_locations = "\n".join(f"- {loc}" for loc in location_list)
 
-    prompt = (
+    user_prompt = get_user_prompt(username) if username else ""
+    base_prompt = (
         "Ein Benutzer hat folgende Orte besucht und mochte diese sehr:\n\n"
         f"{formatted_locations}\n\n"
         "Empfehle ihm basierend darauf **drei weitere Städte**, die ihm gefallen könnten. "
@@ -44,6 +57,8 @@ def recommendations():
         "3. hidden: <Stadt>, <Land>     → Ein echter Geheimtipp – weniger bekannt, aber lohnenswert, ein Ort abseits der Touristenpfade\n\n"
         "Gib die Ausgabe exakt in diesem Format aus:"
     )
+
+    prompt = f"{base_prompt} \n \n Beachte dabei auch den User-spezifischen Prompt und passe deine Empfehlungen daran an: {user_prompt}"
 
     response = model.generate_content(prompt)
 
