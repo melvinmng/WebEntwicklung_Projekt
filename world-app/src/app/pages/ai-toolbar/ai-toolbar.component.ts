@@ -150,7 +150,7 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
     this.dropdownOpen = false;
 
     const locationsParam = this.selectedLocations.map(loc => `${loc.city}, ${loc.country}`).join(',');
-    const username = localStorage.getItem('currentUser');
+    const username = localStorage.getItem('currentUser') || '';
     let url = `http://localhost:5001/api/recommendations?locations=${encodeURIComponent(locationsParam)}`;
     if (username) {
       url += `&username=${encodeURIComponent(username)}`;
@@ -177,6 +177,9 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
           this.addMarker(rec.lat, rec.lon, type, rec.city, rec.country);
         }
       }
+
+      console.log('User:', response.User);
+      console.log('User Prompt:', response.user_prompt);
 
       this.recommendationsList = recs;
       this.dropdownOpen = true;

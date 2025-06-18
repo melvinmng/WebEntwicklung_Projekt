@@ -19,10 +19,10 @@ CORS(app)
 def get_user_prompt(username: str) -> str:
     """Fetch custom prompt for the user from the DB service."""
     try:
-        res = requests.get(f"http://localhost:5004/api/db-read/USER/{username}")
+        res = requests.get(f"http://db-service:5004/api/db-read/USER/{username}")
         if res.status_code == 200:
             data = res.json()
-            return data.get("PROMPT", "") or ""
+            return data.get("PROMPT", "")
     except Exception:
         pass
     return ""
@@ -97,7 +97,9 @@ def recommendations():
             }
         )
 
-    return jsonify({"recommendations": results})
+    return jsonify(
+        {"recommendations": results, "User": username, "user_prompt": user_prompt}
+    )
 
 
 @app.route("/api/reverse-geocode", methods=["GET"])
