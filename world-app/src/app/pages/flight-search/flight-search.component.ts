@@ -53,7 +53,7 @@ export class FlightSearchComponent {
   }
 
   onTwoPinsSelected(event: { origin: string; destination: string }): void {
-    console.log('EVENT ANGekommen:', event);
+    console.log('EVENT Angekommen:', event);
     const originReq = this.http.get<{ airports: string[] }>(
       `http://localhost:5003/search-airport?query=${encodeURIComponent(event.origin)}`
     );
