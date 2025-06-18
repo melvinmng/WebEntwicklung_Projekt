@@ -258,10 +258,15 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
       .subscribe({
         next: data => {
           if (data.USERLOC) {
-            data.USERLOC.forEach((l: any) => this.addMarker(l.lat, l.lon, 'user'));
+            data.USERLOC.forEach((l: any) => {
+              this.addMarker(l.lat, l.lon, 'user');
+              this.getLocationDetails(l.lat, l.lon);
+            });
           }
           if (data.WISHLOC) {
-            data.WISHLOC.forEach((l: any) => this.addMarker(l.lat, l.lon, 'wishlist'));
+            data.WISHLOC.forEach((l: any) => {
+              this.getWishlistLocationDetails(l.lat, l.lon);
+            });
           }
         },
         complete: () => this.suppressSync = false,
