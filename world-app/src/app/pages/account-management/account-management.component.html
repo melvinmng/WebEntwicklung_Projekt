@@ -1,4 +1,5 @@
 <app-navbar></app-navbar>
+
 <div class="account-wrapper">
   <div class="account-card">
     <h2>Account verwalten</h2>
@@ -11,7 +12,12 @@
     <section>
       <h3>Nutzername ändern</h3>
       <form (ngSubmit)="changeUsername()">
-        <input [(ngModel)]="newUsername" name="newUsername" placeholder="Neuer Benutzername" required />
+        <input
+          [(ngModel)]="newUsername"
+          name="newUsername"
+          placeholder="Neuer Benutzername"
+          required
+        />
         <button type="submit">Aktualisieren</button>
       </form>
       <p *ngIf="messageUser" class="message">{{ messageUser }}</p>
@@ -20,17 +26,39 @@
     <section>
       <h3>Passwort ändern</h3>
       <form (ngSubmit)="changePassword()">
-        <input type="password" [(ngModel)]="currentPassword" name="currentPassword" placeholder="Aktuelles Passwort" required />
-        <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Neues Passwort" required />
+        <input
+          type="password"
+          [(ngModel)]="currentPassword"
+          name="currentPassword"
+          placeholder="Aktuelles Passwort"
+          required
+        />
+        <input
+          type="password"
+          [(ngModel)]="newPassword"
+          name="newPassword"
+          placeholder="Neues Passwort"
+          required
+        />
         <button type="submit">Aktualisieren</button>
       </form>
-      <p *ngIf="messagePassword" class="message" [ngClass]="passwordSuccess ? 'success-message' : 'error-message'">{{ messagePassword }}</p>
+      <p
+        *ngIf="messagePassword"
+        class="message"
+        [ngClass]="passwordSuccess ? 'success-message' : 'error-message'"
+      >
+        {{ messagePassword }}
+      </p>
     </section>
 
     <section>
       <h3>Individueller Gemini Prompt</h3>
       <form (ngSubmit)="savePrompt()">
-        <textarea [(ngModel)]="prompt" name="prompt" placeholder="Dein Prompt"></textarea>
+        <textarea
+          [(ngModel)]="prompt"
+          name="prompt"
+          [placeholder]="prompt || 'Dein Prompt'"
+        ></textarea>
         <button type="submit">Speichern</button>
       </form>
       <p *ngIf="messagePrompt" class="message">{{ messagePrompt }}</p>
