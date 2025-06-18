@@ -3,6 +3,8 @@
   align-items: center;
   justify-content: center;
   height: 100vh;
+  padding-top: 4rem;
+  box-sizing: border-box;
   background-color: var(--blue1);
  }
 
