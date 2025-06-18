@@ -24,7 +24,7 @@
         <input type="password" [(ngModel)]="newPassword" name="newPassword" placeholder="Neues Passwort" required />
         <button type="submit">Aktualisieren</button>
       </form>
-      <p *ngIf="messagePassword" class="message">{{ messagePassword }}</p>
+      <p *ngIf="messagePassword" class="message" [ngClass]="passwordSuccess ? 'success-message' : 'error-message'">{{ messagePassword }}</p>
     </section>
 
     <section>

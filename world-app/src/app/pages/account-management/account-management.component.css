@@ -54,9 +54,16 @@
  }
 
  .message {
-  color: var(--green);
   font-size: 14px;
  }
+
+ .success-message {
+  color: var(--green);
+}
+
+.error-message {
+  color: var(--red);
+}
 
  .current-user {
   margin-bottom: 16px;

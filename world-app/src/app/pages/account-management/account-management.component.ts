@@ -22,6 +22,7 @@ export class AccountManagementComponent implements OnInit {
   messageUser = '';
   messagePassword = '';
   messagePrompt = '';
+  passwordSuccess: boolean | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -48,14 +49,19 @@ export class AccountManagementComponent implements OnInit {
   }
 
   changePassword() {
+    this.passwordSuccess = null;
     this.http.patch('http://localhost:5002/change-password', {
       username: this.username,
       current_password: this.currentPassword,
       new_password: this.newPassword
     }).subscribe({
-      next: () => this.messagePassword = 'Passwort aktualisiert',
+      next: () => {
+        this.messagePassword = 'Passwort aktualisiert';
+        this.passwordSuccess = true;
+      },
       error: (err) => {
         this.messagePassword = err?.error?.error || 'Aktualisierung fehlgeschlagen';
+        this.passwordSuccess = false;
       }
     });
   }
