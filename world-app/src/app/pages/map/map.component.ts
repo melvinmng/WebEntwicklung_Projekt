@@ -1,9 +1,9 @@
-import { Component, AfterViewInit, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewChild, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -20,7 +20,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   styleUrls: ['./map.component.css'],
   imports: [CommonModule, HttpClientModule, FormsModule, NavbarComponent, AiToolbarComponent ]
 })
-export class MapComponent implements AfterViewInit, OnInit {
+export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(AiToolbarComponent) aiToolbarComponent!: AiToolbarComponent;
   @Output() twoPinsSelected = new EventEmitter<{ origin: string; destination: string }>();
 
@@ -28,12 +28,10 @@ export class MapComponent implements AfterViewInit, OnInit {
   private countries = countries;
   public selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   public recommendations: string = '';
-
   public allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
-  private removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
+  public removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
-
   public markerVisibility: Record<MarkerType, boolean> = {
     user: true,
     safe: true,
@@ -41,124 +39,140 @@ export class MapComponent implements AfterViewInit, OnInit {
     hidden: true,
     wishlist: true
   };
+  private username: string = localStorage.getItem('username') || '';
+  private suppressSync = false;
 
   constructor(private http: HttpClient) {}
 
+  ngOnInit(): void {
+    document.addEventListener('click', () => this.aiToolbarComponent.dropdownOpen = false);
+  }
+
   ngAfterViewInit(): void {
-    this.initMap();
-    const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
-    if (mapContainer) {
-      const controlGroup = document.createElement('div');
-      controlGroup.className = 'leaflet-bar leaflet-control leaflet-custom-group';
+    try {
+      this.initMap();
+      if (this.username) {
+        this.loadUserMarkers();
+      }
+      this.addMapButtons();
+    } catch (err) {
+      console.error('Fehler bei initMap oder Map-Setup:', err);
+    }
+  }
 
-      const undoBtn = document.createElement('a');
-      undoBtn.href = '#';
-      undoBtn.title = 'Letzten Marker wiederherstellen';
-      undoBtn.className = 'leaflet-custom-button';
-      undoBtn.innerHTML = '↩️';
-      undoBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.restoreLastMarker();
-      };
-
-      const homeBtn = document.createElement('a');
-      homeBtn.href = '#';
-      homeBtn.title = 'Zur Karten-Startansicht';
-      homeBtn.className = 'leaflet-custom-button';
-      homeBtn.innerHTML = '🏠';
-      homeBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.goHome();
-      };
-
-      const resetBtn = document.createElement('a');
-      resetBtn.href = '#';
-      resetBtn.title = 'Alle Orte zurücksetzen';
-      resetBtn.className = 'leaflet-custom-button';
-      resetBtn.innerHTML = '🗑️';
-      resetBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.clearLocations();
-      };
-
-      controlGroup.appendChild(resetBtn);
-      controlGroup.appendChild(undoBtn);
-      controlGroup.appendChild(homeBtn);
-      mapContainer.appendChild(controlGroup);
+  ngOnDestroy(): void {
+    if (this.map) {
+      this.map.off();
+      this.map.remove();  
+      this.map = undefined!;
     }
   }
 
   private initMap(): void {
+    // Alten Container zurücksetzen (falls schon initialisiert)
+    const container = L.DomUtil.get('map') as HTMLElement;
+    if (container && (container as any)._leaflet_id) {
+      (container as any)._leaflet_id = null;
+      container.innerHTML = '';
+    }
+  
     this.map = L.map('map', {
-      center: [35, 0],
-      zoom: 2,
+      center: [this.initialView.lat, this.initialView.lon],
+      zoom: this.initialView.zoom,
       minZoom: 2,
       maxZoom: 18,
       maxBounds: [[-85, -180], [85, 180]],
       maxBoundsViscosity: 1.0,
-      zoomControl: false // Standard-Zoom-Control deaktivieren
-    });
-
-	L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
-
+      zoomControl: false,
+      dragging: true,      // ist eigentlich Default, aber zur Sicherheit
+      touchZoom: false,
+      tap: false
+    }as any);
+  
+    // Zoom-Buttons unten links
+    L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
+  
+    // OSM-Tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
-
+  
+    // Länder-Grenzen
     L.geoJSON(this.countries, {
       style: { color: 'blue', weight: 1, fillOpacity: 0.1 }
     }).addTo(this.map);
-
+  
+    // Nach dem Einfügen ins DOM einmal die Größe aktualisieren
+    // → verhindert mögliche Probleme, wenn das Map-Div erst nach Darstellung seine Größe bekommt
+    setTimeout(() => this.map.invalidateSize(), 0);
+  
+    // Linksklick → regulärer "user"-Marker
     this.map.on('click', (e: L.LeafletMouseEvent) => {
-      const target = e.originalEvent.target as HTMLElement;
-      if (target.closest('.leaflet-custom-button')) return;
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
-      this.addMarker(lat, lon, 'user');
-      this.getLocationDetails(lat, lon);
+      this.addMarker(e.latlng.lat, e.latlng.lng, 'user');
+      this.getLocationDetails(e.latlng.lat, e.latlng.lng);
     });
-
+  
+    // Rechtsklick → "wishlist"-Marker
     this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
-      this.getWishlistLocationDetails(lat, lon);
+      this.getWishlistLocationDetails(e.latlng.lat, e.latlng.lng);
     });
+
+    // provide map instance to the toolbar component
+    this.aiToolbarComponent.map = this.map;
   }
 
-  /* Konvertiert Koordinaten in Namen */
+  private addMapButtons(): void {
+    const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
+    if (!mapContainer) return;
+
+    const group = document.createElement('div');
+    group.className = 'leaflet-bar leaflet-control leaflet-custom-group';
+
+    const undo = document.createElement('a');
+    undo.innerHTML = '↩️';
+    undo.title = 'Letzten Marker wiederherstellen';
+    undo.className = 'leaflet-custom-button';
+    undo.onclick = e => { e.preventDefault(); this.restoreLastMarker(); };
+
+    const home = document.createElement('a');
+    home.innerHTML = '🏠';
+    home.title = 'Zur Startansicht';
+    home.className = 'leaflet-custom-button';
+    home.onclick = e => { e.preventDefault(); this.goHome(); };
+
+    const clear = document.createElement('a');
+    clear.innerHTML = '🗑️';
+    clear.title = 'Alle Orte zurücksetzen';
+    clear.className = 'leaflet-custom-button';
+    clear.onclick = e => { e.preventDefault(); this.clearLocations(); };
+
+    group.appendChild(clear);
+    group.appendChild(undo);
+    group.appendChild(home);
+    mapContainer.appendChild(group);
+  }
+
   private getLocationDetails(lat: number, lon: number): void {
-    const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
-    this.http.get<any>(url).subscribe(data => {
-      const city = data.city || 'Unbekannt';
-      const country = data.country || 'Unbekannt';
-      const exists = this.selectedLocations.some(loc => loc.lat === lat && loc.lon === lon);
-      if (!exists) {
-        this.selectedLocations.push({ city, country, lat, lon });
-        if (this.selectedLocations.length === 2) {
-          const [a, b] = this.selectedLocations;
-          if (a.city !== 'Unbekannt' && b.city !== 'Unbekannt') {
-            console.log('Emitte jetzt:', a.city, b.city);
-            this.twoPinsSelected.emit({ origin: a.city, destination: b.city });
-          }
+    this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`)
+      .subscribe(data => {
+        const city = data.city || 'Unbekannt';
+        const country = data.country || 'Unbekannt';
+        if (!this.selectedLocations.some(l => l.lat === lat && l.lon === lon)) {
+          this.selectedLocations.push({ city, country, lat, lon });
+          this.syncToDatabase();
         }
-      }
-    });
+      });
   }
 
-  /* Konvertiert Koordinaten in Namen + Wishlist */
   private getWishlistLocationDetails(lat: number, lon: number): void {
-    const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
-    this.http.get<any>(url).subscribe(data => {
-      const city = data.city || 'Unbekannt';
-      const country = data.country || 'Unbekannt';
-      this.addMarker(lat, lon, 'wishlist', city, country);
-    });
+    this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`)
+      .subscribe(data => {
+        const city = data.city || 'Unbekannt';
+        const country = data.country || 'Unbekannt';
+        this.addMarker(lat, lon, 'wishlist', city, country);
+      });
   }
 
-  /* Marker + Farben */
   private getIcon(type: MarkerType): L.Icon {
     const colors: Record<MarkerType, string> = {
       user: 'red',
@@ -167,7 +181,6 @@ export class MapComponent implements AfterViewInit, OnInit {
       hidden: 'green',
       wishlist: 'violet'
     };
-
     return L.icon({
       iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colors[type]}.png`,
       iconSize: [30, 50],
@@ -178,7 +191,6 @@ export class MapComponent implements AfterViewInit, OnInit {
     });
   }
 
-  /* Marker hinzufügen */
   public addMarker(lat: number, lon: number, type: MarkerType, city = '', country = ''): void {
     const marker = L.marker([lat, lon], {
       icon: this.getIcon(type),
@@ -191,112 +203,144 @@ export class MapComponent implements AfterViewInit, OnInit {
       this.map.removeLayer(marker);
       this.removedMarkersStack.push({ lat, lon, type, data: { city, country } });
       this.allMarkers = this.allMarkers.filter(m => m.marker !== marker);
-
-      if (type === 'user' || type === 'wishlist') {
-        this.selectedLocations = this.selectedLocations.filter(loc => loc.lat !== lat || loc.lon !== lon);
+      if (type === 'user') {
+        this.selectedLocations = this.selectedLocations.filter(l => !(l.lat === lat && l.lon === lon));
       }
+      this.syncToDatabase();
     });
 
     this.allMarkers.push({ marker, type });
+
+    // If loaded with city/country, also add to selectedLocations
+    if ((type === 'user' || type === 'wishlist') && city && country) {
+      if (!this.selectedLocations.some(l => l.lat === lat && l.lon === lon)) {
+        this.selectedLocations.push({ city, country, lat, lon });
+      }
+    }
+
+    this.syncToDatabase();
   }
 
-   /* Marker an/aus in Legende */
+  private syncToDatabase(): void {
+    if (this.suppressSync || !this.username) return;
+
+    const userLoc = this.allMarkers
+      .filter(m => m.type === 'user')
+      .map(m => {
+        const p = m.marker.getLatLng();
+        return { lat: p.lat, lon: p.lng };
+      });
+    const wishLoc = this.allMarkers
+      .filter(m => m.type === 'wishlist')
+      .map(m => {
+        const p = m.marker.getLatLng();
+        return { lat: p.lat, lon: p.lng };
+      });
+    const payload = { USERLOC: userLoc, WISHLOC: wishLoc };
+
+    this.http.get<any>(`http://localhost:5004/api/db-read/USER/${this.username}`)
+      .subscribe({
+        next: () => {
+          this.http.patch(`http://localhost:5004/api/db-update/${this.username}`, payload)
+            .subscribe();
+        },
+        error: () => {
+          const createPayload = { USER: this.username, ...payload };
+          this.http.post('http://localhost:5004/api/db-write', createPayload)
+            .subscribe();
+        }
+      });
+  }
+
+  private loadUserMarkers(): void {
+    this.suppressSync = true;
+    this.http.get<any>(`http://localhost:5004/api/db-read/USER/${this.username}`)
+      .subscribe({
+        next: data => {
+          if (data.USERLOC) {
+            data.USERLOC.forEach((l: any) => this.addMarker(l.lat, l.lon, 'user'));
+          }
+          if (data.WISHLOC) {
+            data.WISHLOC.forEach((l: any) => this.addMarker(l.lat, l.lon, 'wishlist'));
+          }
+        },
+        complete: () => this.suppressSync = false,
+        error: () => this.suppressSync = false
+      });
+  }
+
   toggleMarkerVisibility(type: MarkerType): void {
     this.markerVisibility[type] = !this.markerVisibility[type];
     this.allMarkers.forEach(({ marker, type: t }) => {
       if (t === type) {
-        this.markerVisibility[t] ? marker.addTo(this.map) : this.map.removeLayer(marker);
+        this.markerVisibility[t] ? marker.addTo(this.map) : marker.remove();
       }
     });
   }
 
-  /* Marker wiederherstellen */
   restoreLastMarker(): void {
     const last = this.removedMarkersStack.pop();
     if (!last) return;
-    const { lat, lon, type, data } = last;
-    this.addMarker(lat, lon, type, data?.city, data?.country);
+    this.addMarker(last.lat, last.lon, last.type, last.data.city, last.data.country);
   }
 
-  /* Standardansicht */
   goHome(): void {
     this.map.setView([this.initialView.lat, this.initialView.lon], this.initialView.zoom);
   }
 
-  /* Mülleimer */
   clearLocations(): void {
     this.selectedLocations = [];
-    this.allMarkers.forEach(m => this.map.removeLayer(m.marker));
+    this.allMarkers.forEach(m => m.marker.remove());
     this.allMarkers = [];
     this.removedMarkersStack = [];
-    this.recommendations = '';
+    this.syncToDatabase();
   }
 
-  /* Orte suchen */
   searchQuery = '';
   searchAndAddMarker(): void {
     if (!this.searchQuery) return;
-    const url = `http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`;
-    this.http.get<any[]>(url).subscribe(results => {
-      if (!results.length) {
-        alert("Ort nicht gefunden.");
-        return;
-      }
-      const { lat, lon } = results[0];
-      this.addMarker(lat, lon, 'user');
-      this.getLocationDetails(lat, lon);
-      this.map.setView([lat, lon], 10);
-    });
+    this.http.get<any[]>(`http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`)
+      .subscribe(results => {
+        if (!results.length) {
+          alert('Ort nicht gefunden.');
+          return;
+        }
+        const { lat, lon } = results[0];
+        this.addMarker(lat, lon, 'user');
+        this.getLocationDetails(lat, lon);
+        this.map.setView([lat, lon], 10);
+      });
   }
 
-  /* Dropdown (Orte?) */
-  ngOnInit(): void {
-    document.addEventListener('click', () => {
-      this.aiToolbarComponent.dropdownOpen = false;
-    });
-  }
-
-  /* Legende anzeigen */
   legendVisible = false;
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
   }
 
-  /* gesuchter Ort fokussieren */
   flyToLocation(event: any): void {
-    const index = event.target.value;
-    const allLocations = this.getAllDropdownLocations();
-    const loc = allLocations[index];
-    if (loc) this.map.setView([loc.lat, loc.lon], 10);
+    const idx = event.target.value;
+    const all = this.getAllDropdownLocations();
+    if (all[idx]) {
+      this.map.setView([all[idx].lat, all[idx].lon], 10);
+    }
   }
 
-  /* ? */
   toggleDropdown(event: MouseEvent): void {
     event.stopPropagation();
     this.aiToolbarComponent.dropdownOpen = !this.aiToolbarComponent.dropdownOpen;
   }
 
-  /* ? */
-  getAllDropdownLocations(): { label: string, lat: number, lon: number }[] {
-    const visited = this.selectedLocations.map(loc => ({
-      label: `${loc.city}, ${loc.country}`,
-      lat: loc.lat,
-      lon: loc.lon
+  getAllDropdownLocations(): { label: string; lat: number; lon: number }[] {
+    const visited = this.selectedLocations.map(l => ({
+      label: `${l.city}, ${l.country}`, lat: l.lat, lon: l.lon
     }));
-
     const wishlist = this.allMarkers
       .filter(m => m.type === 'wishlist')
       .map(m => {
-        const latLng = m.marker.getLatLng();
-        const popup = m.marker.getPopup();
-        const label = popup ? popup.getContent()?.toString() : `Wunschort`;
-        return {
-          label: `★ ${label}`,
-          lat: latLng.lat,
-          lon: latLng.lng
-        };
+        const p = m.marker.getLatLng();
+        const popup = m.marker.getPopup()?.getContent()?.toString() || 'Wunschort';
+        return { label: `★ ${popup}`, lat: p.lat, lon: p.lng };
       });
-
     return [...visited, ...wishlist];
   }
 }
