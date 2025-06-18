@@ -39,7 +39,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     hidden: true,
     wishlist: true
   };
-  private username: string = localStorage.getItem('username') || '';
+  private username: string = localStorage.getItem('currentUser') || '';
   private suppressSync = false;
 
   constructor(private http: HttpClient) {}
