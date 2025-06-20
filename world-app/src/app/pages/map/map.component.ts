@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, ViewChild, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewChild, OnDestroy, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
@@ -21,6 +21,8 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 })
 export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(AiToolbarComponent) aiToolbarComponent!: AiToolbarComponent;
+  @Input() toolbarMode: 'map' | 'flight' = 'map';
+  @Output() flightSearchRequested = new EventEmitter<void>();
 
   public map!: L.Map;
   private countries = countries;
@@ -302,5 +304,11 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   legendVisible = false;
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
+  }
+
+  handleMainAction(): void {
+    if (this.toolbarMode === 'flight') {
+      this.flightSearchRequested.emit();
+    }
   }
 }

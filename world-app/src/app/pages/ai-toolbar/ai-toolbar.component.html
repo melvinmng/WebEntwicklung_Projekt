@@ -2,12 +2,12 @@
     <div class="aiToolbar-group">
       <!-- Empfehlungsbutton mit integriertem Dropdown-Pfeil -->
       <div class="recommendation-button-wrapper">
-        <button (click)="generateRecommendations()" [disabled]="isLoading">
-          <span>Empfehlungen generieren</span>
+        <button (click)="onMainAction()" [disabled]="isLoading">
+          <span>{{ mode === 'map' ? 'Empfehlungen generieren' : 'Flüge suchen' }}</span>
           <span *ngIf="isLoading" class="loading-spinner"></span>
-          <span 
-            *ngIf="recommendationsList.length > 0" 
-            class="dropdown-icon" 
+          <span
+            *ngIf="mode === 'map' && recommendationsList.length > 0"
+            class="dropdown-icon"
             (click)="toggleDropdown($event)">
             ▼
           </span>

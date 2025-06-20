@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
@@ -22,6 +22,8 @@ export class AiToolbarComponent implements OnInit {
   @Input() selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   @Input() allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
   @Input() removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
+  @Input() mode: 'map' | 'flight' = 'map';
+  @Output() mainAction = new EventEmitter<void>();
   private countries = countries;
   public recommendations: string = '';
   public isLoading: boolean = false;
@@ -238,5 +240,13 @@ export class AiToolbarComponent implements OnInit {
       });
 
     return [...visited, ...wishlist];
+  }
+
+  onMainAction(): void {
+    if (this.mode === 'map') {
+      this.generateRecommendations();
+    } else {
+      this.mainAction.emit();
+    }
   }
 }

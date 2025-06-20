@@ -8,6 +8,9 @@
   [selectedLocations]="selectedLocations"
   [allMarkers]="allMarkers"
   [removedMarkersStack]="removedMarkersStack">
+  [removedMarkersStack]="removedMarkersStack"
+  [mode]="toolbarMode"
+  (mainAction)="handleMainAction()">
 </app-ai-toolbar>
 <!-- Legenden-Toggle-Button -->
 <div class="legend-toggle" (click)="toggleLegend()">Legende</div>
