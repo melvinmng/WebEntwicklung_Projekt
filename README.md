@@ -78,15 +78,14 @@ Um alle Dienste starten zu können, müssen einige API-Schlüssel in `.env`‑Da
      GEMINI_API_KEY=DEIN_KEY
      ```
 
-2. **Supabase URL & API Key**
+2. **Supabase API Key**
    - Erforderlich für den *DB-Service* und optional für den *Flight-Service*.
-   - Beide Werte findest du in deinem Supabase-Projekt unter `Project Settings → API`.
+   - Den API Key findest du in deinem Supabase-Projekt unter `Project Settings → API`.
    - Datei für den DB-Service: `world-app/backend/db-service/.env`
      ```
-     SUPABASE_URL=DEINE_URL
      SUPABASE_API_KEY=DEIN_KEY
      ```
-   - Optional kann der *Flight-Service* die gleiche Datei `world-app/backend/flight-service/.env` mit folgendem Inhalt nutzen:
+   - Optional kann der *Flight-Service* die gleiche Datei `world-app/backend/flight-service/.env` mit folgendem Inhalt nutzen (hier reicht aber auch der öffentliche Key im Code selbst):
      ```
      SUPABASE_API_KEY=DEIN_KEY
      ```
