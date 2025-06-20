@@ -25,6 +25,34 @@ der Datenbank hinterlegt, wird er für die Generierung verwendet.
 
 > Stelle sicher, dass du im Projekt-Root arbeitest – dort, wo die `docker-compose.yml` liegt.
 
+## Kubernetes
+
+Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benoetigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben.
+
+Zunaechst muessen die Docker-Images gebaut werden:
+
+```bash
+docker build -t api-service:latest world-app/backend/api-service
+docker build -t auth-service:latest world-app/backend/auth-service
+docker build -t flight-service:latest world-app/backend/flight-service
+docker build -t db-service:latest world-app/backend/db-service
+docker build -t frontend:latest world-app
+```
+
+Danach die Ressourcen anwenden:
+
+```bash
+kubectl apply -f k8s/kubernetes.yaml
+```
+
+Das Frontend ist anschliessend ueber `http://localhost:30080` erreichbar. Die Services koennen sich ueber ihre Namen (z.B. `db-service`) im Cluster gegenseitig ansprechen.
+
+Gestoppt werden kann kubernetes mithilfe von
+
+```bash
+kubectl delete -f k8s/kubernetes.yaml
+```
+
 ## Nutzung der Karte
 
 Auf der Karte kannst du per **Linksklick** einen roten Marker für bereits besuchte Orte setzen. Ein **Rechtsklick** erzeugt einen violetten Marker für die Wunschliste. Ein Klick auf einen Marker entfernt ihn wieder.
