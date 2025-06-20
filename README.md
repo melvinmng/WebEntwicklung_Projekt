@@ -24,3 +24,16 @@ Der API-Service unterstützt optional den Parameter `username` bei
 der Datenbank hinterlegt, wird er für die Generierung verwendet.
 
 > Stelle sicher, dass du im Projekt-Root arbeitest – dort, wo die `docker-compose.yml` liegt.
+
+## Nutzung der Karte
+
+Auf der Karte kannst du per **Linksklick** einen roten Marker für bereits besuchte Orte setzen. Ein **Rechtsklick** erzeugt einen violetten Marker für die Wunschliste. Ein Klick auf einen Marker entfernt ihn wieder.
+
+Nach dem Generieren von Empfehlungen erscheinen weitere Marker:
+
+- 🟡 **Safe** – bewährte Reiseziele
+- 🔵 **Experimental** – etwas ausgefallenere Vorschläge
+- 🟢 **Geheimtipp** – noch unbekannte Orte
+
+Die **Legende** unten rechts blendet einzelne Markertypen ein oder aus. 
+Links unten findest du zusätzliche Buttons, um alle Marker zu löschen, den letzten Marker wiederherzustellen oder zur Startansicht zurückzukehren.

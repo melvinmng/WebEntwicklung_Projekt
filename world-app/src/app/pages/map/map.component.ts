@@ -41,6 +41,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   };
   private username: string = localStorage.getItem('currentUser') || '';
   private suppressSync = false;
+  infoVisible = !localStorage.getItem('hideMapInfo');
 
   constructor(private http: HttpClient) {}
 
@@ -304,6 +305,18 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   legendVisible = false;
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
+  }
+
+  toggleInfo(): void {
+    this.infoVisible = !this.infoVisible;
+    if (!this.infoVisible) {
+      localStorage.setItem('hideMapInfo', 'true');
+    }
+  }
+
+  closeInfo(): void {
+    this.infoVisible = false;
+    localStorage.setItem('hideMapInfo', 'true');
   }
 
   handleMainAction(): void {

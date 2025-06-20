@@ -11,6 +11,27 @@
   [mode]="toolbarMode"
   (mainAction)="handleMainAction()">
 </app-ai-toolbar>
+
+<!-- Hilfe-Overlay -->
+<div class="map-overlay" *ngIf="infoVisible">
+  <h4>Tipps zur Bedienung</h4>
+  <ul>
+    <li>Linksklick: <span class="color-dot red"></span> besucht</li>
+    <li>Rechtsklick: <span class="color-dot violet"></span> Wunschliste</li>
+    <li>Klicke auf Marker zum Entfernen</li>
+    <li>Empfehlungen: <span class="color-dot yellow"></span> sicher,
+      <span class="color-dot blue"></span> experimentell,
+      <span class="color-dot green"></span> Geheimtipp</li>
+    <li>Legende blendet Marker ein oder aus</li>
+    <li>🗑️ alles löschen, ↩️ letzter Marker zurück, 🏠 Startansicht</li>
+  </ul>
+  <button (click)="closeInfo()">OK</button>
+</div>
+
+<!-- Hilfe-Toggle-Button -->
+<div class="info-toggle" (click)="toggleInfo()">Hilfe</div>
+
+
 <!-- Legenden-Toggle-Button -->
 <div class="legend-toggle" (click)="toggleLegend()">Legende</div>
 
