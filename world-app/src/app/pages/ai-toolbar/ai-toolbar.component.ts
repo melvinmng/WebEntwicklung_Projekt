@@ -1,9 +1,9 @@
-import { Component, AfterViewInit, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
@@ -17,7 +17,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   styleUrls: ['./ai-toolbar.component.css'],
   imports: [CommonModule, HttpClientModule, FormsModule]
 })
-export class AiToolbarComponent implements AfterViewInit, OnInit {
+export class AiToolbarComponent implements OnInit {
   @Input() map!: L.Map;
   @Input() selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   @Input() allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
@@ -27,62 +27,7 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
 
-  public markerVisibility: Record<MarkerType, boolean> = {
-    user: true,
-    safe: true,
-    experimental: true,
-    hidden: true,
-    wishlist: true
-  };
-
   constructor(private http: HttpClient) {}
-
-  ngAfterViewInit(): void {
-    const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
-    if (mapContainer) {
-      const controlGroup = document.createElement('div');
-      controlGroup.className = 'leaflet-bar leaflet-control leaflet-custom-group';
-
-      const undoBtn = document.createElement('a');
-      undoBtn.href = '#';
-      undoBtn.title = 'Letzten Marker wiederherstellen';
-      undoBtn.className = 'leaflet-custom-button';
-      undoBtn.innerHTML = '↩️';
-      undoBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.restoreLastMarker();
-      };
-
-      const homeBtn = document.createElement('a');
-      homeBtn.href = '#';
-      homeBtn.title = 'Zur Karten-Startansicht';
-      homeBtn.className = 'leaflet-custom-button';
-      homeBtn.innerHTML = '🏠';
-      homeBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.goHome();
-      };
-
-      const resetBtn = document.createElement('a');
-      resetBtn.href = '#';
-      resetBtn.title = 'Alle Orte zurücksetzen';
-      resetBtn.className = 'leaflet-custom-button';
-      resetBtn.innerHTML = '🗑️';
-      resetBtn.onclick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.clearLocations();
-      };
-
-      controlGroup.appendChild(resetBtn);
-      controlGroup.appendChild(undoBtn);
-      controlGroup.appendChild(homeBtn);
-      mapContainer.appendChild(controlGroup);
-    }
-  }
-
 
   private getLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
@@ -187,15 +132,6 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
     });
   }
 
-  toggleMarkerVisibility(type: MarkerType): void {
-    this.markerVisibility[type] = !this.markerVisibility[type];
-    this.allMarkers.forEach(({ marker, type: t }) => {
-      if (t === type) {
-        this.markerVisibility[t] ? marker.addTo(this.map) : this.map.removeLayer(marker);
-      }
-    });
-  }
-
   restoreLastMarker(): void {
     const last = this.removedMarkersStack.pop();
     if (!last) return;
@@ -229,72 +165,6 @@ export class AiToolbarComponent implements AfterViewInit, OnInit {
       this.getLocationDetails(lat, lon);
       this.map.setView([lat, lon], 10);
     });
-  }
-
-  // ----- Flight search -----
-  flightFormVisible = false;
-  flightOrigin = '';
-  flightDestination = '';
-  flightDate = '';
-  flightSeat = 'economy';
-  flightTrip = 'one-way';
-  flightAdults = 1;
-  flightChildren = 0;
-  flightResults: any = null;
-  flightResultsVisible = false;
-  flightResultsList: any[] = [];
-  flightError = '';
-
-  openFlightSearch(): void {
-    this.flightFormVisible = true;
-    this.flightResultsVisible = false;
-  }
-
-  closeFlightSearch(): void {
-    this.flightFormVisible = false;
-    this.flightResults = null;
-    this.flightResultsVisible = false;
-    this.flightResultsList = [];
-    this.flightError = '';
-  }
-
-  closeFlightResults(): void {
-    this.flightResultsVisible = false;
-  }
-
-  searchFlights(): void {
-    if (!this.flightOrigin || !this.flightDestination || !this.flightDate) return;
-    const params = new URLSearchParams({
-      from_airport: this.flightOrigin,
-      to_airport: this.flightDestination,
-      date: this.flightDate,
-      trip: this.flightTrip,
-      seat: this.flightSeat,
-      adults: this.flightAdults.toString(),
-      children: this.flightChildren.toString(),
-    });
-    this.http
-      .get(`http://localhost:5003/flights?${params.toString()}`)
-      .subscribe({
-        next: (data: any) => {
-          this.flightResults = data;
-          if (data && data.error) {
-            this.flightError = data.error;
-            this.flightResultsList = [];
-          } else {
-            this.flightError = '';
-            this.flightResultsList = (data?.flights || []).sort(
-              (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
-            );
-          }
-          this.flightResultsVisible = true;
-        },
-        error: (err: HttpErrorResponse) => {
-          this.flightError = err.error?.error || 'Fehler bei der Abfrage';
-          this.flightResultsList = [];
-          this.flightResultsVisible = true;
-        }
-      });
   }
 
   ngOnInit(): void {
