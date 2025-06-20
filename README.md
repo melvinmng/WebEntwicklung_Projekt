@@ -27,36 +27,50 @@ der Datenbank hinterlegt, wird er für die Generierung verwendet.
 
 ## Kubernetes
 
-Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benoetigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben.
+Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benoetigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben. Das folgende Rezept fuehrt Schritt fuer Schritt durch den Start mit einem lokalen Cluster (z. B. Minikube).
 
-Zunächst muessen die Docker-Images gebaut werden. Da die Kubernetes-Ressourcen
-lokal gebaute Images verwenden, reicht ein einfaches `docker build` aus:
+0. ** Minikube installieren**
+Für unser Beispiel nutzen wir Minikube, dies kann auf dem Mac mittels Homebrew installiert werden:
+   ```bash
+   brew install minikube
+   ```
+Bei der Installation auf anderen Betriebssystemen kann ChatGPT sicherlich helfen :).
 
-```bash
-docker build -t api-service:latest world-app/backend/api-service
-docker build -t auth-service:latest world-app/backend/auth-service
-docker build -t flight-service:latest world-app/backend/flight-service
-docker build -t db-service:latest world-app/backend/db-service
-docker build -t frontend:latest world-app
-```
+1. **Cluster starten**
+   ```bash
+   minikube start
+   ```
 
-Danach die Ressourcen anwenden:
+2. **Docker-Umgebung des Clusters aktivieren** – so landen die gebauten Images direkt im richtigen Docker-Daemon. Dies ist wichtig, da im Manifest `imagePullPolicy: Never` gesetzt ist.
+   ```bash
+   eval $(minikube docker-env)
+   ```
 
-```bash
-kubectl apply -f k8s/kubernetes.yaml
-```
+3. **Container-Images bauen**
+   ```bash
+   docker build -t api-service:latest world-app/backend/api-service
+   docker build -t auth-service:latest world-app/backend/auth-service
+   docker build -t flight-service:latest world-app/backend/flight-service
+   docker build -t db-service:latest world-app/backend/db-service
+   docker build -t frontend:latest world-app
+   ```
 
-Da im Manifest `imagePullPolicy: Never` gesetzt ist, muessen die Images im
-gleichen Docker-Daemon gebaut werden, den dein Cluster verwendet (z. B. durch
-`eval $(minikube docker-env)`).
+4. **Ressourcen im Cluster anlegen**
+   ```bash
+   kubectl apply -f k8s/kubernetes.yaml
+   ```
 
-Das Frontend ist anschliessend ueber `http://localhost:30080` erreichbar. Die Services koennen sich ueber ihre Namen (z.B. `db-service`) im Cluster gegenseitig ansprechen.
+5. **Pruefen, ob alle Pods laufen** (optional)
+   ```bash
+   kubectl get pods
+   ```
 
-Gestoppt werden kann kubernetes mithilfe von
+6. **Frontend aufrufen** – im Browser `http://localhost:30080` oeffnen. Die Services koennen sich im Cluster gegenseitig ueber ihre Namen (z. B. `db-service`) ansprechen.
 
-```bash
-kubectl delete -f k8s/kubernetes.yaml
-```
+7. **Cluster aufraeumen**
+   ```bash
+   kubectl delete -f k8s/kubernetes.yaml
+   ```
 
 ## Nutzung der Karte
 
