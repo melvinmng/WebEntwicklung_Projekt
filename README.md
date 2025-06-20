@@ -65,3 +65,28 @@ Nach dem Generieren von Empfehlungen erscheinen weitere Marker:
 
 Die **Legende** unten rechts blendet einzelne Markertypen ein oder aus. 
 Links unten findest du zusätzliche Buttons, um alle Marker zu löschen, den letzten Marker wiederherzustellen oder zur Startansicht zurückzukehren.
+
+## Benötigte API-Keys
+
+Um alle Dienste starten zu können, müssen einige API-Schlüssel in `.env`‑Dateien abgelegt werden. Die Dateien liegen jeweils im Verzeichnis des entsprechenden Service (neben `app.py`). Falls sie noch nicht existieren, lege sie an.
+
+1. **Gemini API Key**
+   - Benötigt vom *API-Service* zur Generierung der Reisetipps.
+   - Den Schlüssel erhältst du im [Google AI Studio](https://aistudio.google.com/app/apikey).
+   - Datei: `world-app/backend/api-service/.env`
+     ```
+     GEMINI_API_KEY=DEIN_KEY
+     ```
+
+2. **Supabase URL & API Key**
+   - Erforderlich für den *DB-Service* und optional für den *Flight-Service*.
+   - Beide Werte findest du in deinem Supabase-Projekt unter `Project Settings → API`.
+   - Datei für den DB-Service: `world-app/backend/db-service/.env`
+     ```
+     SUPABASE_URL=DEINE_URL
+     SUPABASE_API_KEY=DEIN_KEY
+     ```
+   - Optional kann der *Flight-Service* die gleiche Datei `world-app/backend/flight-service/.env` mit folgendem Inhalt nutzen:
+     ```
+     SUPABASE_API_KEY=DEIN_KEY
+     ```
