@@ -41,11 +41,14 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   };
   private username: string = localStorage.getItem('currentUser') || '';
   private suppressSync = false;
-  infoVisible = !localStorage.getItem('hideMapInfo');
+  infoVisible = true;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
+    // Ensure the help overlay is visible each time the page is opened
+    localStorage.removeItem('hideMapInfo');
+    this.infoVisible = true;
     document.addEventListener('click', () => this.aiToolbarComponent.dropdownOpen = false);
   }
 
@@ -309,14 +312,10 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleInfo(): void {
     this.infoVisible = !this.infoVisible;
-    if (!this.infoVisible) {
-      localStorage.setItem('hideMapInfo', 'true');
-    }
   }
 
   closeInfo(): void {
     this.infoVisible = false;
-    localStorage.setItem('hideMapInfo', 'true');
   }
 
   handleMainAction(): void {
