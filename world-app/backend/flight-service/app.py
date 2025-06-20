@@ -58,8 +58,11 @@ def flights():
         return jsonify({"error": str(e)}), 404
 
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+SUPABASE_API_KEY = (
+    os.getenv("SUPABASE_API_KEY")
+    or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
+)  # The second API Key is publicly available and automatically gives you "anon"-rights, which is possible as we are able to create policies in supabase itself. You will only have reading access to the db using this key.
+SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
 TABLE_NAME = "airports"
 
 
@@ -74,7 +77,6 @@ def get_airport_code():
     url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
     headers = {
         "apikey": SUPABASE_API_KEY,
-        "Authorization": f"Bearer {SUPABASE_API_KEY}",
     }
 
     response = requests.get(url, headers=headers)
@@ -90,38 +92,9 @@ def get_airport_code():
     if not data:
         return jsonify({"error": "Kein Flughafen gefunden!"}), 404
 
-    # Optional: Wenn mehrere gefunden, gib alle zurück
     iata_codes = [entry["iata_code"] for entry in data if entry["iata_code"] != ""]
     return jsonify({"iata_codes": iata_codes})
 
 
-# Beispielaufruf: /airport_code?name=Frankfurt
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003)
-    # name = "Bonn"
-    # if not name:
-    #     print("error: 'Bitte Parameter name angeben!")
-
-    # # Supabase REST-API Query bauen
-    # url = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=iata_code&name=ilike.*{name}*"
-    # headers = {
-    #     "apikey": SUPABASE_API_KEY,
-    #     "Authorization": f"Bearer {SUPABASE_API_KEY}",
-    # }
-
-    # response = requests.get(url, headers=headers)
-    # if response.status_code != 200:
-    #     print((f"error: Fehler beim Supabase-Request!, details: {response.text}"))
-
-    # data = response.json()
-    # if not data:
-    #     print("error: Kein Flughafen gefunden!")
-
-    # # Optional: Wenn mehrere gefunden, gib alle zurück
-    # iata_codes = [entry["iata_code"] for entry in data if entry["iata_code"] != ""]
-
-    # for entry in iata_codes:
-    #     print(entry)
-
-    # print(response.json())
