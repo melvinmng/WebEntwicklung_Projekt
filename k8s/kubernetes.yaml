@@ -15,6 +15,7 @@ spec:
       containers:
       - name: api-service
         image: api-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5000
 ---
@@ -48,6 +49,7 @@ spec:
       containers:
       - name: auth-service
         image: auth-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5002
 ---
@@ -81,6 +83,7 @@ spec:
       containers:
       - name: flight-service
         image: flight-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5003
 ---
@@ -114,13 +117,9 @@ spec:
       containers:
       - name: db-service
         image: db-service:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 5004
-        env:
-        - name: SUPABASE_URL
-          value: "YOUR_SUPABASE_URL"
-        - name: SUPABASE_API_KEY
-          value: "YOUR_SUPABASE_API_KEY"
 ---
 apiVersion: v1
 kind: Service
@@ -152,6 +151,7 @@ spec:
       containers:
       - name: frontend
         image: frontend:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 80
 ---

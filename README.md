@@ -29,7 +29,8 @@ der Datenbank hinterlegt, wird er für die Generierung verwendet.
 
 Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benoetigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben.
 
-Zunaechst muessen die Docker-Images gebaut werden:
+Zunächst muessen die Docker-Images gebaut werden. Da die Kubernetes-Ressourcen
+lokal gebaute Images verwenden, reicht ein einfaches `docker build` aus:
 
 ```bash
 docker build -t api-service:latest world-app/backend/api-service
@@ -44,6 +45,10 @@ Danach die Ressourcen anwenden:
 ```bash
 kubectl apply -f k8s/kubernetes.yaml
 ```
+
+Da im Manifest `imagePullPolicy: Never` gesetzt ist, muessen die Images im
+gleichen Docker-Daemon gebaut werden, den dein Cluster verwendet (z. B. durch
+`eval $(minikube docker-env)`).
 
 Das Frontend ist anschliessend ueber `http://localhost:30080` erreichbar. Die Services koennen sich ueber ihre Namen (z.B. `db-service`) im Cluster gegenseitig ansprechen.
 
