@@ -11,8 +11,11 @@ CORS(app)
 
 load_dotenv()
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
+SUPABASE_API_KEY = (
+    os.getenv("SUPABASE_API_KEY")
+    or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
+)  # The second API Key is publicly available and automatically gives you "anon"-rights, which is possible as we are able to create policies in supabase itself. You will only have reading access to the db using this key.
 TABLE_NAME = "user-data"
 
 
