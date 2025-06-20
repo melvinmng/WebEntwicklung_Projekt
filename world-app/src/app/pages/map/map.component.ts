@@ -1,11 +1,10 @@
-import { Component, AfterViewInit, OnInit, ViewChild, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AiToolbarComponent } from '../ai-toolbar/ai-toolbar.component';
@@ -18,11 +17,10 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   standalone: true,
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
-  imports: [CommonModule, HttpClientModule, FormsModule, NavbarComponent, AiToolbarComponent ]
+  imports: [CommonModule, HttpClientModule, NavbarComponent, AiToolbarComponent ]
 })
 export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(AiToolbarComponent) aiToolbarComponent!: AiToolbarComponent;
-  @Output() twoPinsSelected = new EventEmitter<{ origin: string; destination: string }>();
 
   public map!: L.Map;
   private countries = countries;
@@ -301,51 +299,8 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     this.syncToDatabase();
   }
 
-  searchQuery = '';
-  searchAndAddMarker(): void {
-    if (!this.searchQuery) return;
-    this.http.get<any[]>(`http://localhost:5001/api/search?query=${encodeURIComponent(this.searchQuery)}`)
-      .subscribe(results => {
-        if (!results.length) {
-          alert('Ort nicht gefunden.');
-          return;
-        }
-        const { lat, lon } = results[0];
-        this.addMarker(lat, lon, 'user');
-        this.getLocationDetails(lat, lon);
-        this.map.setView([lat, lon], 10);
-      });
-  }
-
   legendVisible = false;
   toggleLegend(): void {
     this.legendVisible = !this.legendVisible;
-  }
-
-  flyToLocation(event: any): void {
-    const idx = event.target.value;
-    const all = this.getAllDropdownLocations();
-    if (all[idx]) {
-      this.map.setView([all[idx].lat, all[idx].lon], 10);
-    }
-  }
-
-  toggleDropdown(event: MouseEvent): void {
-    event.stopPropagation();
-    this.aiToolbarComponent.dropdownOpen = !this.aiToolbarComponent.dropdownOpen;
-  }
-
-  getAllDropdownLocations(): { label: string; lat: number; lon: number }[] {
-    const visited = this.selectedLocations.map(l => ({
-      label: `${l.city}, ${l.country}`, lat: l.lat, lon: l.lon
-    }));
-    const wishlist = this.allMarkers
-      .filter(m => m.type === 'wishlist')
-      .map(m => {
-        const p = m.marker.getLatLng();
-        const popup = m.marker.getPopup()?.getContent()?.toString() || 'Wunschort';
-        return { label: `★ ${popup}`, lat: p.lat, lon: p.lng };
-      });
-    return [...visited, ...wishlist];
   }
 }
