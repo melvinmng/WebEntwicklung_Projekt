@@ -6,6 +6,8 @@ import google.generativeai as genai
 import requests
 import re
 
+import flask_monitoringdashboard as dashboard
+
 # Load environment variables
 load_dotenv()
 
@@ -13,6 +15,8 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("gemini-2.0-flash")
 
 app = Flask(__name__)
+dashboard.bind(app)
+dashboard.config.init_from(file="/<path to file>/config.cfg")
 CORS(app)
 
 
