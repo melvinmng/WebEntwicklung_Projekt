@@ -2,8 +2,6 @@
 <ul>
   <li *ngFor="let service of services">
     {{ service.name }}
-    <button (click)="startService(service)" [disabled]="status[service.name]">Starten</button>
-    <button (click)="stopService(service)" [disabled]="!status[service.name]">Stoppen</button>
+    <button (click)="openService(service)">Dashboard öffnen</button>
   </li>
-  <button (click)="testOpen()">Test Tab öffnen</button>
 </ul>

@@ -4,3 +4,4 @@ fast-flights
 playwright
 dotenv
 requests
+flask_monitoringdashboard

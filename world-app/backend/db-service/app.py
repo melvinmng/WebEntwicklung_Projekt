@@ -5,7 +5,10 @@ import requests
 from dotenv import load_dotenv
 from flask_cors import CORS
 
+import flask_monitoringdashboard as dashboard
+
 app = Flask(__name__)
+dashboard.bind(app)
 CORS(app)
 
 

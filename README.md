@@ -18,6 +18,7 @@ docker compose down
 - **API-Service**: [http://localhost:5000](http://localhost:5000)
 - **Auth-Service**: [http://localhost:5002](http://localhost:5002)
 - **Flight-Service**: [http://localhost:5003](http://localhost:5003)
+- **DB-Service**: [http://localhost:5004](http://localhost:5004)
 
 Der API-Service unterstützt optional den Parameter `username` bei
 `/api/recommendations`. Ist für diesen Nutzer ein individueller Gemini-Prompt in

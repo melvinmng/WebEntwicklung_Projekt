@@ -11,7 +11,10 @@ from dotenv import load_dotenv
 import os
 import requests
 
+import flask_monitoringdashboard as dashboard
+
 app = Flask(__name__)
+dashboard.bind(app)
 CORS(app, origins=["http://localhost:4200"])
 
 load_dotenv()

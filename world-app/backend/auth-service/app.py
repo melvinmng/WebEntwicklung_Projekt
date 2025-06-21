@@ -2,7 +2,10 @@ from flask import Flask
 from flask_cors import CORS
 from auth import auth_bp
 
+import flask_monitoringdashboard as dashboard
+
 app = Flask(__name__)
+dashboard.bind(app)
 CORS(app)  # <--- Das hier erlaubt Cross-Origin-Requests
 
 app.register_blueprint(auth_bp)

@@ -3,3 +3,4 @@ flask_cors
 requests
 python-dotenv
 flask-cors
+flask_monitoringdashboard
