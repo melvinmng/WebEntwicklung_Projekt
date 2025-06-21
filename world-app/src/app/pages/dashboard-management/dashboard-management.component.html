@@ -1,1 +1,8 @@
 <p>dashboard-management works!</p>
+<ul>
+  <li *ngFor="let service of services">
+    {{ service.name }}
+    <button (click)="startService(service)" [disabled]="status[service.name]">Starten</button>
+    <button (click)="stopService(service)" [disabled]="!status[service.name]">Stoppen</button>
+  </li>
+</ul>
