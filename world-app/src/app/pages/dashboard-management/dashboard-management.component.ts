@@ -1,14 +1,16 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
+  imports: [NgFor, NgIf],
   templateUrl: './dashboard-management.component.html'
 })
 export class DashboardComponent {
   services = [
-    { name: 'API-Service', path: '/pfad/zu/api-service/app.py' },
+    { name: 'API-Service', path: '../api-service/app.py', port: 5055 },
     { name: 'DB-Service', path: '/pfad/zu/db-service/app.py' }
     // weitere Services ...
   ];
@@ -20,7 +22,10 @@ export class DashboardComponent {
 
   startService(service: any) {
     this.http.post('http://localhost:5050/start', { path: service.path, name: service.name })
-      .subscribe(() => this.refreshStatus());
+      .subscribe(() => {
+        this.refreshStatus();
+        window.open('http://localhost:${service.port}', '_blank');
+      });
   }
 
   stopService(service: any) {
