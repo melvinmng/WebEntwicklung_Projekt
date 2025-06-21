@@ -24,7 +24,7 @@ export class DashboardComponent {
     this.http.post('http://localhost:5050/start', { path: service.path, name: service.name })
       .subscribe(() => {
         this.refreshStatus();
-        window.open('http://localhost:${service.port}', '_blank');
+        window.open(`http://localhost:${service.port}`, '_blank');
       });
   }
 
