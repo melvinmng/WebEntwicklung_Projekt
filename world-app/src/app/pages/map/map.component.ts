@@ -48,7 +48,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   ngOnInit(): void {
     // Ensure the help overlay is visible each time the page is opened
     localStorage.removeItem('hideMapInfo');
-    this.infoVisible = true;
+    this.infoVisible = false;
     document.addEventListener('click', () => this.aiToolbarComponent.dropdownOpen = false);
   }
 
