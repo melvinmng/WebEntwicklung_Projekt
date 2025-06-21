@@ -5,4 +5,5 @@
     <button (click)="startService(service)" [disabled]="status[service.name]">Starten</button>
     <button (click)="stopService(service)" [disabled]="!status[service.name]">Stoppen</button>
   </li>
+  <button (click)="testOpen()">Test Tab öffnen</button>
 </ul>

@@ -11,7 +11,7 @@ import { NgFor, NgIf } from '@angular/common';
 export class DashboardComponent {
   services = [
     { name: 'API-Service', path: '../api-service/app.py', port: 5055 },
-    { name: 'DB-Service', path: '/pfad/zu/db-service/app.py' }
+    // { name: 'DB-Service', path: '/pfad/zu/db-service/app.py' }
     // weitere Services ...
   ];
   status: any = {};
@@ -21,10 +21,13 @@ export class DashboardComponent {
   }
 
   startService(service: any) {
+    const win = window.open('', '_blank');
     this.http.post('http://localhost:5050/start', { path: service.path, name: service.name })
       .subscribe(() => {
         this.refreshStatus();
-        window.open(`http://localhost:${service.port}`, '_blank');
+        if (win) {
+          win.location.href = `http://localhost:${service.port}`;
+        }
       });
   }
 
@@ -36,5 +39,9 @@ export class DashboardComponent {
   refreshStatus() {
     this.http.get('http://localhost:5050/status')
       .subscribe(status => this.status = status);
+  }
+
+  testOpen() {
+    window.open('https://google.de', '_blank');
   }
 }
