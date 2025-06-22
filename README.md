@@ -117,9 +117,6 @@ minikube delete
 eval $(minikube docker-env -u)
 ```
 
-
----
-
 ## Nutzung der Karte
 
 Auf der Karte kannst du per **Linksklick** einen roten Marker für bereits besuchte Orte setzen. Ein **Rechtsklick** erzeugt einen violetten Marker für die Wunschliste. Ein Klick auf einen Marker entfernt ihn wieder.
