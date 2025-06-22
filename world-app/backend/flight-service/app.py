@@ -16,7 +16,7 @@ import flask_monitoringdashboard as dashboard
 app = Flask(__name__)
 dashboard.bind(app)
 dashboard.config.init_from(file="config.cfg")
-CORS(app, origins=["http://localhost:4200"])
+CORS(app)
 
 load_dotenv()
 
