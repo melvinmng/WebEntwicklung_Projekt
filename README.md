@@ -163,6 +163,3 @@ Um alle Dienste starten zu können, müssen einige API-Schlüssel in `.env`‑Da
      SUPABASE_API_KEY=DEIN_KEY
      ```
 
----
-
-**Wenn du magst, kann ich noch einen Troubleshooting-Bereich für Kubernetes/Minikube/Port-Forward einfügen!**
