@@ -1,7 +1,17 @@
-<p>dashboard-management works!</p>
-<ul>
-  <li *ngFor="let service of services">
-    {{ service.name }}
-    <button (click)="openService(service)">Dashboard öffnen</button>
-  </li>
-</ul>
+<app-navbar></app-navbar>
+<div class="account-wrapper">
+  <div class="account-card">
+    <ul>
+        <li *ngFor="let service of services">
+            <button (click)="openService(service)">🗗 {{ service.name }}</button>
+        </li>
+    </ul>
+    <div class="disclaimer">
+        <p>
+            ⓘ Das ist eine Entwicklungsumgebung.<br><br>
+            Für den Login kannst du ggf. als Benutzernamen
+            und Passwort jeweils "admin" nutzen.
+        </p>
+    </div>
+  </div>
+</div>
