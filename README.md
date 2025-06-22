@@ -106,6 +106,18 @@ Danach kannst du **[http://localhost:4200](http://localhost:4200)** im Browser a
 kubectl delete -f k8s/kubernetes.yaml
 ```
 
+**8. Minikube stoppen**
+
+```bash
+minikube stop
+# optional: entfernt das Cluster komplett
+minikube delete
+# Falls du die Docker-Umgebung aus Schritt 2 aktiviert hast,
+# kannst du sie damit wieder deaktivieren:
+eval $(minikube docker-env -u)
+```
+
+
 ---
 
 ## Nutzung der Karte
