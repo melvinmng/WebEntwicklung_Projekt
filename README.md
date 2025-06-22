@@ -32,7 +32,7 @@ der Datenbank hinterlegt, wird er für die Generierung verwendet.
 
 ## Kubernetes
 
-Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benötigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben. Das folgende Rezept führt Schritt für Schritt durch den Start mit einem lokalen Cluster (z. B. Minikube).
+Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benötigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben. Das folgende Rezept führt Schritt für Schritt durch den Start mit einem lokalen Cluster (z. B. Minikube). Nutzen sie bitte **entweder Docker Compose oder Kubernetes, da beide auf denselben Ports laufen**, was zu erheblichen Problemen führen kann.
 
 **0. Minikube installieren**
 Für unser Beispiel nutzen wir Minikube, dies kann auf dem Mac mittels Homebrew installiert werden:
@@ -93,10 +93,10 @@ kubectl port-forward service/api-service 5001:5001
 kubectl port-forward service/auth-service 5002:5002
 kubectl port-forward service/flight-service 5003:5003
 kubectl port-forward service/db-service 5004:5004
-kubectl port-forward service/frontend 30080:80
+kubectl port-forward service/frontend 4200:80
 ```
 
-Danach kannst du **[http://localhost:30080](http://localhost:30080)** im Browser aufrufen und das Frontend nutzen.
+Danach kannst du **[http://localhost:4200](http://localhost:4200)** im Browser aufrufen und das Frontend nutzen.
 
 
 
