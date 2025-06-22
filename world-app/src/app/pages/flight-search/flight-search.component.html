@@ -11,13 +11,13 @@
                 <input [(ngModel)]="flightOrigin" name="origin" required
                        (ngModelChange)="clearError('origin')"
                        [ngClass]="{ 'input-error': formErrors.origin }" 
-                       placeholder="Hier IATA-Code eintragen"/>
+                       placeholder="IATA-Code eintragen (z.B. FRA)"/>
             </label>
             <label>Nach
                 <input [(ngModel)]="flightDestination" name="destination" required
                        (ngModelChange)="clearError('destination')"
                        [ngClass]="{ 'input-error': formErrors.destination }" 
-                       placeholder="Hier IATA-Code eintragen"/>
+                       placeholder="IATA-Code eintragen (z.B. JFK)"/>
             </label>
             <label>Datum
                 <input type="date" [(ngModel)]="flightDate" name="date" required
@@ -54,7 +54,7 @@
             <button type="submit">Suchen</button>
             <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
             <button type="button" (click)="resetFlightSearch()">Zurücksetzen</button>
-            <button type="button" (click)="closeFlightSearch()">Schließen</button>
+            <button type="close" (click)="closeFlightSearch()">Schließen</button>
             </form>
             </div>
             <div class="flight-results-box" *ngIf="flightResultsVisible" (click)="$event.stopPropagation()">

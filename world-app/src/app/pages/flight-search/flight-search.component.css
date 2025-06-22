@@ -107,9 +107,7 @@ app-map {
   background-color: var(--blue4);
   color: var(--white);
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 0.5em;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -118,7 +116,18 @@ app-map {
   margin-top: 10px;
   background-color: var(--gray6);
   border: none;
-  border-radius: 8px;
+  border-radius: 0.5em;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.flight-search-box button[type="close"] {
+  margin-top: 10px;
+  background-color: var(--white);
+  color: var(--red);
+  border-color: var(--black);
+  border: solid 0.1em;
+  border-radius: 0.5em;
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
@@ -129,6 +138,10 @@ app-map {
 
 .flight-search-box button[type="button"]:hover {
   background-color: var(--gray5);
+}
+
+.flight-search-box button[type="close"]:hover {
+  background-color: var(--red-light);
 }
 
 .flight-results-box {
@@ -190,7 +203,8 @@ app-map {
 
 .flight-error {
   color: var(--red);
-  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: center;
 }
 
 .input-error {
