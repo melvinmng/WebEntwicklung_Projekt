@@ -16,7 +16,7 @@ model = genai.GenerativeModel("gemini-2.0-flash")
 
 app = Flask(__name__)
 dashboard.bind(app)
-dashboard.config.init_from(file="/<path to file>/config.cfg")
+dashboard.config.init_from(file="config.cfg")
 CORS(app)
 
 
@@ -161,4 +161,4 @@ def search_location():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5001)
