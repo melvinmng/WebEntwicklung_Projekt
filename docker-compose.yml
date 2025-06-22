@@ -5,7 +5,7 @@ services:
     build:
       context: world-app/backend/api-service
     ports:
-      - "5001:5000"
+      - "5001:5001"
 
   auth-service:
     build:
