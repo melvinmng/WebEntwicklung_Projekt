@@ -15,7 +15,7 @@ docker compose down
 ## Zugriff auf die App
 
 - **Frontend**: [http://localhost:4200](http://localhost:4200)
-- **API-Service**: [http://localhost:5000](http://localhost:5000)
+- **API-Service**: [http://localhost:5001](http://localhost:5001)
 - **Auth-Service**: [http://localhost:5002](http://localhost:5002)
 - **Flight-Service**: [http://localhost:5003](http://localhost:5003)
 - **DB-Service**: [http://localhost:5004](http://localhost:5004)
