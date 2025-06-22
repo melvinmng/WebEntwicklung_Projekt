@@ -85,31 +85,19 @@ Die im Kubernetes-Manifest definierten Services nutzen `type: NodePort` – das 
 
 #### **Empfohlene Variante: Port-Forwarding**
 
-Starte ein Port-Forwarding für den Frontend-Service:
+Starte ein Port-Forwarding für den Frontend-Service, sowie alle anderen Services (somit können diese auch mit localhost aufgerufen werden):
 
 ```bash
+kubectl port-forward service/api-service 5000:5000
+kubectl port-forward service/auth-service 5002:5002
+kubectl port-forward service/flight-service 5003:5003
+kubectl port-forward service/db-service 5004:5004
 kubectl port-forward service/frontend 30080:80
 ```
 
 Danach kannst du **[http://localhost:30080](http://localhost:30080)** im Browser aufrufen und das Frontend nutzen.
 
-#### **Alternative: Zugriff über die Node-IP**
 
-Mit
-
-```bash
-kubectl get nodes -o wide
-```
-
-findest du die externe Node-IP (z.B. `192.168.65.3` bei Docker Desktop). Dann kannst du versuchen:
-
-```
-http://192.168.65.3:30080
-```
-
-(Bei Docker Desktop klappt das aber nicht immer ohne weiteres – **Port-Forwarding funktioniert immer!**)
-
----
 
 **7. Cluster aufräumen**
 
