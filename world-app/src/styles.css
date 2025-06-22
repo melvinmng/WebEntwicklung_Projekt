@@ -1,14 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root {
-  /*
-  --navbar-bg: #f0f0f0; /* Hintergrundfarbe der Navbar
-  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --navbar-link: #333;
-  --navbar-link-color-hover: #007bff;
-  --navbar-link-active-bg: #007bff;
-  --navbar-link-active-color: #fff;
-  */
+  --navbar-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
 
   /* Grau */
   --shadow: rgba(0,0,0,0.3);
@@ -43,9 +36,9 @@
   --red-light:   #ffb3ab;
 
   /* Signalfarben Gelb */
-  --yellow-dark: #a37500;
-  --yellow:      #ffcc00;
-  --yellow-light:#fff4b8;
+  --yellow-dark: #977926;
+  --yellow:      #ffd18c;
+  --yellow-light:#ffe7b8;
 }
 
 html, body {

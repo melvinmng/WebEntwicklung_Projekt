@@ -6,21 +6,22 @@
   padding-top: 4rem;
   box-sizing: border-box;
   background-color: var(--blue1);
+  font-size: 16px;
  }
 
  .account-card {
   background: var(--white);
-  padding: 40px;
+  padding: 30px;
   border-radius: 16px;
   box-shadow: 0 8px 24px var(--shadow);
   max-width: 500px;
   width: 100%;
-  text-align: center;
+  text-align: left;
  }
 
- .account-card h2 {
-  margin-top: 0;
-  margin-bottom: 24px;
+ .account-card h3 {
+  margin-top: 2em;
+  margin-bottom: 1em;
   color: var(--gray1);
  }
 
@@ -28,27 +29,26 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 8px;
+  margin-top: 10px;
  }
 
  .account-card input,
  .account-card textarea {
-  padding: 12px;
+  padding: 10px;
   border: 1px solid var(--gray5);
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 0.5em;
   font-family: inherit;
+  margin-top: -5px;
  }
 
  .account-card button {
-  padding: 12px;
+  padding: 6px;
   background-color: var(--blue4);
   color: var(--white);
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  border-radius: 0.5em;
   cursor: pointer;
+  margin-top: -5px;
  }
 
  .account-card button:hover {
@@ -69,6 +69,49 @@
 
  .current-user {
   margin-bottom: 16px;
-  font-size: 16px;
   color: var(--gray1);
+}
+
+.app-footer {
+  background-color: var(--gray7);
+  padding: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--black);
+}
+
+.footer-content p {
+  margin: 5px 0;
+}
+
+.name-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.name-list li {
+  margin: 0 5px;
+}
+
+.footer-date {
+  margin-top: 10px;
+}
+
+/* Für mittlere Bildschirme */
+@media (max-width: 768px) {
+  .account-card {
+    max-width: 400px;
+  }
+}
+
+/* Für kleine Bildschirme (z. B. Smartphones) */
+@media (max-width: 480px) {
+  .account-card {
+    max-width: 300px;
+  }
 }
