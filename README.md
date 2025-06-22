@@ -17,9 +17,10 @@ docker compose down
 ### Zugriff auf die App
 
 * **Frontend**: [http://localhost:4200](http://localhost:4200)
-* **API-Service**: [http://localhost:5000](http://localhost:5000)
+* **API-Service**: [http://localhost:5001](http://localhost:5001)
 * **Auth-Service**: [http://localhost:5002](http://localhost:5002)
 * **Flight-Service**: [http://localhost:5003](http://localhost:5003)
+* **DB-Service**: [http://localhost:5004](http://localhost:5004)
 
 Der API-Service unterstützt optional den Parameter `username` bei
 `/api/recommendations`. Ist für diesen Nutzer ein individueller Gemini-Prompt in
@@ -88,7 +89,7 @@ Die im Kubernetes-Manifest definierten Services nutzen `type: NodePort` – das 
 Starte ein Port-Forwarding für den Frontend-Service, sowie alle anderen Services (somit können diese auch mit localhost aufgerufen werden):
 
 ```bash
-kubectl port-forward service/api-service 5000:5000
+kubectl port-forward service/api-service 5001:5001
 kubectl port-forward service/auth-service 5002:5002
 kubectl port-forward service/flight-service 5003:5003
 kubectl port-forward service/db-service 5004:5004
