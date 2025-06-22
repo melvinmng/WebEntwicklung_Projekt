@@ -128,7 +128,7 @@ Nach dem Generieren von Empfehlungen erscheinen weitere Marker:
 
 * 🟡 **Safe** – bewährte Reiseziele
 * 🔵 **Experimental** – etwas ausgefallenere Vorschläge
-* 🟢 **Geheimtipp** – noch unbekannte Orte
+* 🟢 **Geheimtipp** – eher unbekannte Orte, die dennoch zu dir passen könnten
 
 Die **Legende** unten rechts blendet einzelne Markertypen ein oder aus.
 Links unten findest du zusätzliche Buttons, um alle Marker zu löschen, den letzten Marker wiederherzustellen oder zur Startansicht zurückzukehren.
