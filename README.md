@@ -86,7 +86,7 @@ Die im Kubernetes-Manifest definierten Services nutzen `type: NodePort` – das 
 
 #### **Empfohlene Variante: Port-Forwarding**
 
-Starte ein Port-Forwarding für den Frontend-Service, sowie alle anderen Services (somit können diese auch mit localhost aufgerufen werden):
+Starte ein Port-Forwarding für den Frontend-Service, sowie alle anderen Services (somit können diese auch mit localhost aufgerufen werden). Jeder der folgenden Befehle muss in einem separaten Terminal ausgeführt werden:
 
 ```bash
 kubectl port-forward service/api-service 5001:5001
