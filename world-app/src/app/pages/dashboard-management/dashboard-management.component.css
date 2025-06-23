@@ -2,8 +2,8 @@
   padding-top: 4.5rem;
   min-height: 100vh;
   box-sizing: border-box;
-  background-color: var(--blue1);
-  color: var(--black);
+  background: linear-gradient(135deg, var(--blue1) 0%, var(--blue3) 100%);
+  color: var(--white);
   font-size: 16px;
  }
 
@@ -15,7 +15,7 @@
 
  .dashboard-content {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: flex-start;
   padding: 0 1rem 1rem;
 }
@@ -23,8 +23,14 @@
 .charts {
   flex: 1;
   display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+@media (min-width: 900px) {
+  .charts {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .chart-box {
@@ -32,7 +38,13 @@
   padding: 1rem;
   border-radius: 1em;
   box-shadow: 0 8px 24px var(--shadow);
- }
+  color: var(--gray1);
+  transition: transform 0.2s ease;
+}
+
+.chart-box:hover {
+  transform: translateY(-4px);
+}
 
  .chart-box h2 {
   margin: 0 0 0.5rem 0;
@@ -45,6 +57,7 @@
   padding: 1rem;
   border-radius: 1em;
   box-shadow: 0 8px 24px var(--shadow);
+  color: var(--gray1);
 }
 
 .sidebar h2 {
@@ -92,6 +105,7 @@
   padding: 1rem;
   border-radius: 1em;
   box-shadow: 0 8px 24px var(--shadow);
+  color: var(--gray1);
 }
 
 canvas {

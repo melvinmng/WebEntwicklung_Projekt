@@ -24,21 +24,21 @@
         <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>
         <p><strong>Meistgereister Nutzer:</strong> {{ stats.most_active_user || '-' }}</p>
       </div>
+      <aside class="sidebar">
+        <h2>Dienste</h2>
+        <ul>
+          <li *ngFor="let service of services">
+            <button (click)="openService(service)">🗗 {{ service.name }}</button>
+          </li>
+        </ul>
+        <div class="disclaimer">
+          <p>
+            ⓘ Das ist eine Entwicklungsumgebung.<br><br>
+            Für den Login kannst du ggf. als Benutzernamen
+            und Passwort jeweils "admin" nutzen.
+          </p>
+        </div>
+      </aside>
     </div>
-    <aside class="sidebar">
-      <h2>Dienste</h2>
-      <ul>
-        <li *ngFor="let service of services">
-          <button (click)="openService(service)">🗗 {{ service.name }}</button>
-        </li>
-      </ul>
-      <div class="disclaimer">
-        <p>
-          ⓘ Das ist eine Entwicklungsumgebung.<br><br>
-          Für den Login kannst du ggf. als Benutzernamen
-          und Passwort jeweils "admin" nutzen.
-        </p>
-      </div>
-    </aside>
   </div>
 </div>
