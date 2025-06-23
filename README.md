@@ -1,5 +1,16 @@
 # World App – Projekt starten & stoppen
 
+## Abhängigkeiten installieren
+Gehen sie im Terminal auf den Ordner world-app (falls nötig):
+```bash
+cd world-app
+```
+
+Installieren sie die Node Modules:
+```bash
+npm install
+```
+
 ## Docker Compose
 
 ### Projekt starten

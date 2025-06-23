@@ -59,6 +59,11 @@
   color: var(--yellow-dark);
 }
 
+.kpi-wrapper {
+  margin-bottom: 1em;
+  line-height: 1.4;
+}
+
 /* Für mittlere Bildschirme */
 @media (max-width: 768px) {
   .account-card {

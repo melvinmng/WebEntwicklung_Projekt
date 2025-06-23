@@ -112,5 +112,50 @@ def update_user_data(username):
         )
 
 
+@app.route("/api/stats", methods=["GET"])
+def get_stats():
+    """Aggregierte Kennzahlen aus der Benutzerdatenbank."""
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    }
+
+    response = requests.get(f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers)
+
+    if response.status_code != 200:
+        return (
+            jsonify({"error": "Fehler beim Abrufen", "details": response.text}),
+            500,
+        )
+
+    entries = response.json()
+
+    total_users = len(entries)
+    total_user_locations = sum(len(e.get("USERLOC", [])) for e in entries)
+    total_wish_locations = sum(len(e.get("WISHLOC", [])) for e in entries)
+
+    avg_user_locations = total_user_locations / total_users if total_users else 0
+
+    # Der most active User ist in dieser Metrik derjenige, welcher die meisten Orte gespeichert hat,
+    # haben zwei User dieselbe Anzahl an Einträgen, wird nur der zuerst Gefundene zurückgegeben
+    most_active_user = None
+    max_locations = -1
+    for entry in entries:
+        count = len(entry.get("USERLOC", []))
+        if count > max_locations:
+            most_active_user = entry.get("USER")
+            max_locations = count
+
+    return jsonify(
+        {
+            "total_users": total_users,
+            "total_user_locations": total_user_locations,
+            "total_wish_locations": total_wish_locations,
+            "avg_user_locations": avg_user_locations,
+            "most_active_user": most_active_user,
+        }
+    )
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5004)

@@ -1,6 +1,11 @@
 <app-navbar></app-navbar>
 <div class="account-wrapper">
   <div class="account-card">
+    <h1>Dashboard Management</h1> <div *ngIf="stats" class="kpi-wrapper">
+      <p><strong>Registrierte Nutzer:</strong> {{ stats.total_users }}</p>
+      <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>
+      <p><strong>Meistgereister Nutzer:</strong> {{ stats.most_active_user || '-' }}</p>
+    </div>
     <ul>
         <li *ngFor="let service of services">
             <button (click)="openService(service)">🗗 {{ service.name }}</button>
