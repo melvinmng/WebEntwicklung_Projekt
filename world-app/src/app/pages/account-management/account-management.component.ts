@@ -71,9 +71,9 @@ export class AccountManagementComponent implements OnInit {
   }
 
   changePassword(): void {
-    const body = { currentPassword: this.currentPassword, newPassword: this.newPassword };
+    const body = { currentPassword: this.currentPassword, newPassword: this.newPassword, username: this.username };
     this.http
-      .post(`http://localhost:5002/change-password`, body)
+      .patch(`http://localhost:5002/change-password`, body)
       .subscribe({
         next: () => {
           this.passwordSuccess = true;

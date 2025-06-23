@@ -39,6 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userLocChart?.destroy();
     this.wishLocChart?.destroy();
     this.ratioChart?.destroy();
+    this.loginChart?.destroy();
   }
 
   private fetchStats() {
