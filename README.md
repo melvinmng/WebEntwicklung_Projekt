@@ -68,6 +68,7 @@ eval $(minikube docker-env)
 ```
 
 **3. Container-Images bauen**
+Folgende Befehle können als ganzes ins Terminal eingegeben werden. Wichtig ist, dass sich das Terminal auf den übergeordneten Pfad (WEBENTWICKLUNG_PROJEKT) bezieht, nicht auf den world-app Ordner.
 
 ```bash
 docker build -t api-service:latest world-app/backend/api-service
