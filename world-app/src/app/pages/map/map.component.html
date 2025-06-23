@@ -2,6 +2,9 @@
 
 <!-- Karte -->
 <div id="map"></div>
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+</div>
 <app-navbar></app-navbar>
 <app-ai-toolbar
   [map]="map"
