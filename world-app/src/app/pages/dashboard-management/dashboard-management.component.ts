@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgFor } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { Router, NavigationEnd } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators';
 import Chart from 'chart.js/auto';
 
 
@@ -13,18 +16,33 @@ import Chart from 'chart.js/auto';
   templateUrl: './dashboard-management.component.html',
   styleUrls: ['./dashboard-management.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   stats: any = null;
   userLocChart: any;
   wishLocChart: any;
   ratioChart: any;
   loginChart: any;
   loginData: any;
+  private routerSub?: Subscription;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit(): void {
-    this.http.get<any>('http://localhost:5004/api/stats').subscribe({
+    this.fetchStats();
+    this.routerSub = this.router.events
+      .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd && e.urlAfterRedirects === '/dashboard'))
+      .subscribe(() => this.fetchStats());
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+    this.userLocChart?.destroy();
+    this.wishLocChart?.destroy();
+    this.ratioChart?.destroy();
+  }
+
+  private fetchStats() {
+    this.http.get<any>('http://localhost:5004/api/stats', { headers: { 'Cache-Control': 'no-cache' } }).subscribe({
       next: data => {
         this.stats = data;
         setTimeout(() => this.initCharts(), 0);
@@ -63,6 +81,9 @@ export class DashboardComponent implements OnInit {
     const ctx3 = (document.getElementById('ratioChart') as HTMLCanvasElement)?.getContext('2d');
 
     if (ctx1) {
+      if (this.userLocChart) {
+        this.userLocChart.destroy();
+      }
       this.userLocChart = new Chart(ctx1, {
         type: 'bar',
         data: {
@@ -74,6 +95,9 @@ export class DashboardComponent implements OnInit {
     }
 
     if (ctx2) {
+      if (this.wishLocChart) {
+        this.wishLocChart.destroy();
+      }
       this.wishLocChart = new Chart(ctx2, {
         type: 'bar',
         data: {
@@ -85,6 +109,9 @@ export class DashboardComponent implements OnInit {
     }
 
     if (ctx3) {
+      if (this.ratioChart) {
+        this.ratioChart.destroy();
+      }
       this.ratioChart = new Chart(ctx3, {
         type: 'pie',
         data: {
@@ -100,6 +127,9 @@ export class DashboardComponent implements OnInit {
     if (!this.loginData) return;
     const ctx = (document.getElementById('loginChart') as HTMLCanvasElement)?.getContext('2d');
     if (ctx) {
+      if (this.loginChart) {
+        this.loginChart.destroy();
+      }
       this.loginChart = new Chart(ctx, {
         type: 'line',
         data: {
