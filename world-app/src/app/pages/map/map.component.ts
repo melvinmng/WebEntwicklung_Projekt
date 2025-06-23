@@ -45,17 +45,15 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(private http: HttpClient) {}
 
-  private docClickListener = () => {
-    if (this.aiToolbarComponent) {
-      this.aiToolbarComponent.dropdownOpen = false;
-    }
+  private onDocumentClick = () => {
+    this.aiToolbarComponent.dropdownOpen = false;
   };
 
   ngOnInit(): void {
     // Ensure the help overlay is visible each time the page is opened
     localStorage.removeItem('hideMapInfo');
     this.infoVisible = false;
-    document.addEventListener('click', this.docClickListener);
+    document.addEventListener('click', this.onDocumentClick);
   }
 
   ngAfterViewInit(): void {
@@ -71,7 +69,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    document.removeEventListener('click', this.docClickListener);
+    document.removeEventListener('click', this.onDocumentClick);
     if (this.map) {
       this.map.off();
       this.map.remove();

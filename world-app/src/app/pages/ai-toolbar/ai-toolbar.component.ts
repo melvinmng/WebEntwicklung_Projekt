@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import countriesData from '../../data/countries.geo.json';
@@ -17,7 +17,7 @@ type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
   styleUrls: ['./ai-toolbar.component.css'],
   imports: [CommonModule, HttpClientModule, FormsModule]
 })
-export class AiToolbarComponent implements OnInit {
+export class AiToolbarComponent implements OnInit, OnDestroy {
   @Input() map!: L.Map;
   @Input() selectedLocations: { city: string; country: string; lat: number; lon: number }[] = [];
   @Input() allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
@@ -28,6 +28,9 @@ export class AiToolbarComponent implements OnInit {
   public recommendations: string = '';
   public isLoading: boolean = false;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
+  private onDocumentClick = () => {
+    this.dropdownOpen = false;
+  };
 
   constructor(private http: HttpClient) {}
 
@@ -174,11 +177,11 @@ export class AiToolbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    document.addEventListener('click', this.docClickListener);
+    document.addEventListener('click', this.onDocumentClick);
   }
 
   ngOnDestroy(): void {
-    document.removeEventListener('click', this.docClickListener);
+    document.removeEventListener('click', this.onDocumentClick);
   }
 
   aiToolbarVisible = true;
