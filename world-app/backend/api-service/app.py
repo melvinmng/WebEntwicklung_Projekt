@@ -19,6 +19,9 @@ dashboard.bind(app)
 dashboard.config.init_from(file="config.cfg")
 CORS(app)
 
+# Simple in-memory cache for reverse geocoding results
+_reverse_cache = {}
+
 
 def get_user_prompt(username: str) -> str:
     """Fetch custom prompt for the user from the DB service."""
@@ -114,6 +117,15 @@ def reverse_geocode():
     if not lat or not lon:
         return jsonify({"error": "Missing latitude or longitude"}), 400
 
+    # Normalize coordinates to reduce cache misses
+    try:
+        key = (round(float(lat), 4), round(float(lon), 4))
+    except ValueError:
+        return jsonify({"error": "Invalid latitude or longitude"}), 400
+
+    if key in _reverse_cache:
+        return jsonify(_reverse_cache[key])
+
     nominatim_url = (
         f"https://nominatim.openstreetmap.org/reverse"
         f"?format=json&lat={lat}&lon={lon}&zoom=10&addressdetails=1"
@@ -138,7 +150,9 @@ def reverse_geocode():
     )
     country = address.get("country") or "Unbekannt"
 
-    return jsonify({"city": city, "country": country})
+    result = {"city": city, "country": country}
+    _reverse_cache[key] = result
+    return jsonify(result)
 
 
 @app.route("/api/search", methods=["GET"])
