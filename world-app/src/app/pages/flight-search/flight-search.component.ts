@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
@@ -16,6 +16,7 @@ import { MapComponent } from '../map/map.component';
   styleUrl: './flight-search.component.css'
 })
 export class FlightSearchComponent {
+  @ViewChild(MapComponent) mapComponent!: MapComponent;
   constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   // ----- Flight search -----
@@ -144,12 +145,14 @@ export class FlightSearchComponent {
           }
           this.flightResultsVisible = true;
           this.isLoading = false;
+          this.showFlightOnMap();
         },
         error: (err: HttpErrorResponse) => {
           this.flightError = err.error?.error || 'Fehler bei der Abfrage';
           this.flightResultsList = [];
           this.flightResultsVisible = true;
           this.isLoading = false;
+          this.showFlightOnMap();
         }
       });
   }
@@ -206,5 +209,18 @@ export class FlightSearchComponent {
         this.iataSearchError = 'Fehler beim Abrufen der Flughafencodes';
         }
       });
+  }
+
+  private showFlightOnMap(): void {
+    if (!this.mapComponent) return;
+    const originReq = this.http.get<any[]>(`http://localhost:5001/api/search?query=${this.flightOrigin}%20airport`);
+    const destReq = this.http.get<any[]>(`http://localhost:5001/api/search?query=${this.flightDestination}%20airport`);
+    forkJoin([originReq, destReq]).subscribe(([o, d]) => {
+      if (!o.length || !d.length) return;
+      const origin = { lat: parseFloat(o[0].lat), lon: parseFloat(o[0].lon) };
+      const dest = { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+      this.mapComponent.showFlight(origin, dest);
+      this.mapComponent.map.fitBounds([[origin.lat, origin.lon], [dest.lat, dest.lon]]);
+    });
   }
 }

@@ -67,6 +67,12 @@
     </li>
     <li>
       <label>
+        <input type="checkbox" [checked]="markerVisibility.airport" (change)="toggleMarkerVisibility('airport')" />
+        🟠 Flughäfen
+      </label>
+    </li>
+    <li>
+      <label>
         <input type="checkbox" [checked]="markerVisibility.user" (change)="toggleMarkerVisibility('user')" />
         🔴 Besucht
       </label>
