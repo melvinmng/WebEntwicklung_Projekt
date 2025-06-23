@@ -31,6 +31,10 @@ export class AiToolbarComponent implements OnInit {
 
   constructor(private http: HttpClient) {}
 
+  private docClickListener = () => {
+    this.dropdownOpen = false;
+  };
+
   private getLocationDetails(lat: number, lon: number): void {
     const url = `http://localhost:5001/api/reverse-geocode?lat=${lat}&lon=${lon}`;
     this.http.get<any>(url).subscribe(data => {
@@ -170,9 +174,11 @@ export class AiToolbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    document.addEventListener('click', () => {
-      this.dropdownOpen = false;
-    });
+    document.addEventListener('click', this.docClickListener);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('click', this.docClickListener);
   }
 
   aiToolbarVisible = true;
