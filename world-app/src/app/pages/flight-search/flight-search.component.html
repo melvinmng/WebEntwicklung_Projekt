@@ -51,7 +51,10 @@
             <div *ngIf="foundIataCodes.length">Gefundene Codes: {{ foundIataCodes.join(', ') }}</div>
             <div *ngIf="iataSearchError" class="flight-error">{{ iataSearchError }}</div>
             <div *ngIf="bookingError" class="flight-error">{{ bookingError }}</div>
-            <button type="submit">Suchen</button>
+            <button type="submit" [disabled]="isLoading">
+                Suchen
+                <span *ngIf="isLoading" class="loading-spinner"></span>
+            </button>
             <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
             <button type="button" (click)="resetFlightSearch()">Zurücksetzen</button>
             <button type="close" (click)="closeFlightSearch()">Schließen</button>

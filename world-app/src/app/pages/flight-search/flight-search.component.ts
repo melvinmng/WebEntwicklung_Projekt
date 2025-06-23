@@ -39,6 +39,7 @@ export class FlightSearchComponent {
   foundIataCodes: string[] = [];
   airportNameSearch = '';
   iataSearchError = '';
+   isLoading = false;
 
 
   validateBookingFields(): boolean {
@@ -116,6 +117,7 @@ export class FlightSearchComponent {
       this.bookingError = 'Bitte alle Pflichtfelder ausfüllen';
       return;
     }
+    this.isLoading = true;
     this.bookingError = '';
     const params = new URLSearchParams({
       from_airport: this.flightOrigin,
@@ -141,11 +143,13 @@ export class FlightSearchComponent {
             );
           }
           this.flightResultsVisible = true;
+          this.isLoading = false;
         },
         error: (err: HttpErrorResponse) => {
           this.flightError = err.error?.error || 'Fehler bei der Abfrage';
           this.flightResultsList = [];
           this.flightResultsVisible = true;
+          this.isLoading = false;
         }
       });
   }
