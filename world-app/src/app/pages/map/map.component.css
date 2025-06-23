@@ -179,6 +179,7 @@
 .color-dot.yellow { background: var(--yellow); }
 .color-dot.blue { background: var(--blue4); }
 .color-dot.green { background: var(--green); }
+.color-dot.orange { background: orange; }
 
 .loading-overlay {
   position: fixed;

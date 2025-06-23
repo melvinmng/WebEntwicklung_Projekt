@@ -6,9 +6,9 @@ import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { MarkerType } from '../../types/marker-type';
 
 const countries: FeatureCollection = countriesData as FeatureCollection;
-type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 
 @Component({
   selector: 'app-ai-toolbar',
@@ -63,7 +63,8 @@ export class AiToolbarComponent implements OnInit, OnDestroy {
       safe: 'yellow',
       experimental: 'blue',
       hidden: 'green',
-      wishlist: 'violet'
+      wishlist: 'violet',
+      airport: 'orange'
     };
 
     return L.icon({
