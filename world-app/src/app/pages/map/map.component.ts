@@ -133,31 +133,46 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   private addMapButtons(): void {
     const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
     if (!mapContainer) return;
-
+  
     const group = document.createElement('div');
     group.className = 'leaflet-bar leaflet-control leaflet-custom-group';
-
+  
+    L.DomEvent.disableClickPropagation(group);
+  
     const undo = document.createElement('a');
     undo.innerHTML = '↩️';
     undo.title = 'Letzten Marker wiederherstellen';
     undo.className = 'leaflet-custom-button';
-    undo.onclick = e => { e.preventDefault(); this.restoreLastMarker(); };
-
+    undo.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.restoreLastMarker();
+    };
+  
     const home = document.createElement('a');
     home.innerHTML = '🏠';
     home.title = 'Zur Startansicht';
     home.className = 'leaflet-custom-button';
-    home.onclick = e => { e.preventDefault(); this.goHome(); };
-
+    home.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.goHome();
+    };
+  
     const clear = document.createElement('a');
     clear.innerHTML = '🗑️';
     clear.title = 'Alle Orte zurücksetzen';
     clear.className = 'leaflet-custom-button';
-    clear.onclick = e => { e.preventDefault(); this.clearLocations(); };
-
+    clear.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.clearLocations();
+    };
+  
     group.appendChild(clear);
     group.appendChild(undo);
     group.appendChild(home);
+  
     mapContainer.appendChild(group);
   }
 
