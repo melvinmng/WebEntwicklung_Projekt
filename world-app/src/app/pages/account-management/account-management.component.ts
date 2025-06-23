@@ -71,7 +71,11 @@ export class AccountManagementComponent implements OnInit {
   }
 
   changePassword(): void {
-    const body = { currentPassword: this.currentPassword, newPassword: this.newPassword, username: this.username };
+    const body = {
+      username: this.username,
+      current_password: this.currentPassword,
+      new_password: this.newPassword,
+    };
     this.http
       .patch(`http://localhost:5002/change-password`, body)
       .subscribe({
