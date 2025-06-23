@@ -1,22 +1,27 @@
 <app-navbar></app-navbar>
 <div class="account-wrapper">
   <div class="account-card">
-    <h1>Dashboard Management</h1> <div *ngIf="stats" class="kpi-wrapper">
+    <h1>Dashboard Management</h1>
+    <div *ngIf="stats" class="kpi-wrapper">
       <p><strong>Registrierte Nutzer:</strong> {{ stats.total_users }}</p>
       <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>
       <p><strong>Meistgereister Nutzer:</strong> {{ stats.most_active_user || '-' }}</p>
     </div>
+    <canvas id="ratioChart"></canvas>
+    <canvas id="userLocChart"></canvas>
+    <canvas id="wishLocChart"></canvas>
+    <!-- TODO: Liniendiagramm "Registrierungen pro Monat" sobald Daten vorhanden -->
     <ul>
-        <li *ngFor="let service of services">
-            <button (click)="openService(service)">🗗 {{ service.name }}</button>
-        </li>
+      <li *ngFor="let service of services">
+        <button (click)="openService(service)">🗗 {{ service.name }}</button>
+      </li>
     </ul>
     <div class="disclaimer">
-        <p>
-            ⓘ Das ist eine Entwicklungsumgebung.<br><br>
-            Für den Login kannst du ggf. als Benutzernamen
-            und Passwort jeweils "admin" nutzen.
-        </p>
+      <p>
+        ⓘ Das ist eine Entwicklungsumgebung.<br><br>
+        Für den Login kannst du ggf. als Benutzernamen
+        und Passwort jeweils "admin" nutzen.
+      </p>
     </div>
   </div>
 </div>

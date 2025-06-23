@@ -64,6 +64,11 @@
   line-height: 1.4;
 }
 
+canvas {
+  max-width: 100%;
+  margin-bottom: 1em;
+}
+
 /* Für mittlere Bildschirme */
 @media (max-width: 768px) {
   .account-card {

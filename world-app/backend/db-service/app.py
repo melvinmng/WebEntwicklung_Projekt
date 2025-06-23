@@ -3,7 +3,6 @@ from flask_cors import CORS
 import os
 import requests
 from dotenv import load_dotenv
-from flask_cors import CORS
 
 import flask_monitoringdashboard as dashboard
 
@@ -146,6 +145,10 @@ def get_stats():
             most_active_user = entry.get("USER")
             max_locations = count
 
+    # Anzahl der gespeicherten Orte und Wunschorte pro Nutzer
+    user_location_counts = {e.get("USER"): len(e.get("USERLOC", [])) for e in entries}
+    wish_location_counts = {e.get("USER"): len(e.get("WISHLOC", [])) for e in entries}
+
     return jsonify(
         {
             "total_users": total_users,
@@ -153,6 +156,8 @@ def get_stats():
             "total_wish_locations": total_wish_locations,
             "avg_user_locations": avg_user_locations,
             "most_active_user": most_active_user,
+            "user_location_counts": user_location_counts,
+            "wish_location_counts": wish_location_counts,
         }
     )
 
