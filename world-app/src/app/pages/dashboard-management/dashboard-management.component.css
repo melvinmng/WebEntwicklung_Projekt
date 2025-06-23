@@ -1,84 +1,115 @@
-.account-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+.dashboard-wrapper {
+  padding-top: 4.5rem;
+  min-height: 100vh;
   box-sizing: border-box;
   background-color: var(--blue1);
+  color: var(--black);
   font-size: 16px;
  }
 
- .account-card {
+ .dashboard-title {
+  text-align: center;
+  color: var(--white);
+  margin-bottom: 1rem;
+}
+
+ .dashboard-content {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0 1rem 1rem;
+}
+
+.charts {
+  flex: 1;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.chart-box {
   background: var(--white);
-  padding: 1em;
+  padding: 1rem;
   border-radius: 1em;
   box-shadow: 0 8px 24px var(--shadow);
-  max-width: 500px;
-  width: 100%;
-  text-align: left;
  }
 
- .account-card button {
+ .chart-box h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--white);
+  padding: 1rem;
+  border-radius: 1em;
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+ .sidebar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+  font-size: 14px;
+}
+
+.sidebar li {
+  margin-top: 1rem;
+}
+
+.sidebar button {
   padding: 6px;
   background-color: var(--blue4);
   color: var(--white);
   border: none;
   border-radius: 0.5em;
   cursor: pointer;
-  margin-top: -5px;
  }
 
- .account-card button:hover {
+ .sidebar button:hover {
   background-color: var(--blue3);
- }
-
- ul {
-  list-style-type: none;
-  padding-left: 0;
-  font-size: 14px;
-  margin: 0.5em;
-  margin-top: -1em;
-}
-
-.account-card li {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em; /* Abstand zwischen Name und Button */
-  margin-top: 2em;
 }
 
 .disclaimer {
-  margin: 0.5em;
-  margin-top: 3em;
-  padding: 1em;
-  padding-top: 0em;
-  padding-bottom: 0em;
+  margin-top: 1rem;
+  padding: 0.5rem;
   border-radius: 0.5em;
   background-color: var(--yellow-light);
   border: solid var(--yellow-dark);
   color: var(--yellow-dark);
+  font-size: 0.9rem;
 }
 
 .kpi-wrapper {
-  margin-bottom: 1em;
-  line-height: 1.4;
+  margin-top: 1rem;
+  background: var(--white);
+  padding: 1rem;
+  border-radius: 1em;
+  box-shadow: 0 8px 24px var(--shadow);
 }
 
 canvas {
   max-width: 100%;
-  margin-bottom: 1em;
+  width: 100%;
+  height: auto;
 }
 
 /* Für mittlere Bildschirme */
 @media (max-width: 768px) {
-  .account-card {
-    max-width: 400px;
+  .dashboard-content {
+    flex-direction: column;
   }
 }
 
 /* Für kleine Bildschirme (z. B. Smartphones) */
 @media (max-width: 480px) {
-  .account-card {
-    max-width: 300px;
+  .sidebar {
+    width: auto;
   }
 }

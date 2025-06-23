@@ -1,27 +1,40 @@
 <app-navbar></app-navbar>
-<div class="account-wrapper">
-  <div class="account-card">
-    <h1>Dashboard Management</h1>
-    <div *ngIf="stats" class="kpi-wrapper">
-      <p><strong>Registrierte Nutzer:</strong> {{ stats.total_users }}</p>
-      <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>
-      <p><strong>Meistgereister Nutzer:</strong> {{ stats.most_active_user || '-' }}</p>
+<div class="dashboard-wrapper">
+  <h1 class="dashboard-title">Dashboard Management</h1>
+  <div class="dashboard-content">
+    <div class="charts">
+      <div class="chart-box">
+        <h2>Verhältnis Besuchte Orte/Wunschliste</h2>
+        <canvas id="ratioChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h2>Besuchte Orte je Nutzer</h2>
+        <canvas id="userLocChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h2>Wunschorte je Nutzer</h2>
+        <canvas id="wishLocChart"></canvas>
+      </div>
+      <div class="kpi-wrapper" *ngIf="stats">
+        <p><strong>Registrierte Nutzer:</strong> {{ stats.total_users }}</p>
+        <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>
+        <p><strong>Meistgereister Nutzer:</strong> {{ stats.most_active_user || '-' }}</p>
+      </div>
     </div>
-    <canvas id="ratioChart"></canvas>
-    <canvas id="userLocChart"></canvas>
-    <canvas id="wishLocChart"></canvas>
-    <!-- TODO: Liniendiagramm "Registrierungen pro Monat" sobald Daten vorhanden -->
-    <ul>
-      <li *ngFor="let service of services">
-        <button (click)="openService(service)">🗗 {{ service.name }}</button>
-      </li>
-    </ul>
-    <div class="disclaimer">
-      <p>
-        ⓘ Das ist eine Entwicklungsumgebung.<br><br>
-        Für den Login kannst du ggf. als Benutzernamen
-        und Passwort jeweils "admin" nutzen.
-      </p>
-    </div>
+    <aside class="sidebar">
+      <h2>Dienste</h2>
+      <ul>
+        <li *ngFor="let service of services">
+          <button (click)="openService(service)">🗗 {{ service.name }}</button>
+        </li>
+      </ul>
+      <div class="disclaimer">
+        <p>
+          ⓘ Das ist eine Entwicklungsumgebung.<br><br>
+          Für den Login kannst du ggf. als Benutzernamen
+          und Passwort jeweils "admin" nutzen.
+        </p>
+      </div>
+    </aside>
   </div>
 </div>
