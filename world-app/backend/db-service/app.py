@@ -3,6 +3,7 @@ from flask_cors import CORS
 import os
 import requests
 from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
 import flask_monitoringdashboard as dashboard
 
@@ -17,6 +18,14 @@ load_dotenv()
 SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
 SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
 TABLE_NAME = "user-data"
+
+
+def _parse_date(value: str) -> datetime:
+    """Safely parse an ISO date string."""
+    try:
+        return datetime.fromisoformat(value)
+    except Exception:
+        return datetime.min
 
 
 @app.route("/api/db-write", methods=["POST"])
@@ -160,6 +169,76 @@ def get_stats():
             "wish_location_counts": wish_location_counts,
         }
     )
+
+
+@app.route("/api/log-login/<username>", methods=["POST"])
+def log_login(username):
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    }
+
+    params = {"USER": f"eq.{username}", "select": "LOGINS"}
+    res = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers, params=params
+    )
+    if res.status_code != 200 or not res.json():
+        return jsonify({"error": "Benutzer nicht gefunden"}), 404
+
+    logins = res.json()[0].get("LOGINS", []) or []
+    cutoff = datetime.utcnow() - timedelta(weeks=6)
+    logins = [d for d in logins if _parse_date(d) >= cutoff]
+    logins.append(datetime.utcnow().date().isoformat())
+
+    patch_headers = {**headers, "Content-Type": "application/json"}
+    patch = requests.patch(
+        f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}",
+        headers=patch_headers,
+        params={"USER": f"eq.{username}"},
+        json={"LOGINS": logins},
+    )
+
+    if patch.status_code in [200, 204]:
+        return jsonify({"message": "Login erfasst"}), 200
+    return jsonify({"error": "Fehler beim Aktualisieren", "details": patch.text}), 400
+
+
+@app.route("/api/login-stats", methods=["GET"])
+def login_stats():
+    headers = {
+        "apikey": SUPABASE_API_KEY,
+        "Authorization": f"Bearer {SUPABASE_API_KEY}",
+    }
+
+    res = requests.get(f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers)
+    if res.status_code != 200:
+        return jsonify({"error": "Fehler beim Abrufen", "details": res.text}), 500
+
+    entries = res.json()
+    cutoff = datetime.utcnow() - timedelta(weeks=6)
+    counts = {}
+    for entry in entries:
+        username = entry.get("USER")
+        logins = entry.get("LOGINS", []) or []
+        cleaned = []
+        for d in logins:
+            dt = _parse_date(d)
+            if dt >= cutoff:
+                cleaned.append(dt.date().isoformat())
+                counts[dt.date().isoformat()] = counts.get(dt.date().isoformat(), 0) + 1
+        if len(cleaned) != len(logins):
+            patch_headers = {**headers, "Content-Type": "application/json"}
+            requests.patch(
+                f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}",
+                headers=patch_headers,
+                params={"USER": f"eq.{username}"},
+                json={"LOGINS": cleaned},
+            )
+
+    today = datetime.utcnow().date()
+    dates = [(today - timedelta(days=i)).isoformat() for i in reversed(range(42))]
+    series = [counts.get(d, 0) for d in dates]
+    return jsonify({"dates": dates, "counts": series})
 
 
 if __name__ == "__main__":

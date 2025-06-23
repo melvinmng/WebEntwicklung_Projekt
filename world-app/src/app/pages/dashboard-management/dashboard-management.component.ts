@@ -18,6 +18,8 @@ export class DashboardComponent implements OnInit {
   userLocChart: any;
   wishLocChart: any;
   ratioChart: any;
+  loginChart: any;
+  loginData: any;
 
   constructor(private http: HttpClient) {}
 
@@ -28,6 +30,14 @@ export class DashboardComponent implements OnInit {
         setTimeout(() => this.initCharts(), 0);
       },
       error: err => console.error('Fehler beim Abrufen der Statistiken', err)
+    });
+
+    this.http.get<any>('http://localhost:5004/api/login-stats').subscribe({
+      next: data => {
+        this.loginData = data;
+        setTimeout(() => this.initLoginChart(), 0);
+      },
+      error: err => console.error('Fehler beim Abrufen der Login-Statistiken', err)
     });
   }
   services = [
@@ -84,8 +94,21 @@ export class DashboardComponent implements OnInit {
         options: { responsive: true }
       });
     }
+  }
 
-    // TODO: Sobald Zeitstempel in der Datenbank gespeichert werden,
-    //       hier ein Liniendiagramm der Nutzerregistrierungen implementieren.
+  initLoginChart() {
+    if (!this.loginData) return;
+    const ctx = (document.getElementById('loginChart') as HTMLCanvasElement)?.getContext('2d');
+    if (ctx) {
+      this.loginChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: this.loginData.dates,
+          datasets: [{ label: 'Logins', data: this.loginData.counts as number[] }]
+        },
+        options: { responsive: true }
+      });
+    }
+
   }
 }

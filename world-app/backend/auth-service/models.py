@@ -19,6 +19,7 @@ def register_user(username, hashed_password):
         "USERLOC": [],
         "WISHLOC": [],
         "PROMPT": "",
+        "LOGINS": [],
     }
     res = requests.post(f"{DB_SERVICE_URL}/api/db-write", json=payload)
     return res.status_code == 201
@@ -27,6 +28,12 @@ def register_user(username, hashed_password):
 def update_user(username: str, data: dict) -> bool:
     """Patch user entry via the DB service."""
     res = requests.patch(f"{DB_SERVICE_URL}/api/db-update/{username}", json=data)
+    return res.status_code == 200
+
+
+def add_login(username: str) -> bool:
+    """Inform the DB service about a successful login."""
+    res = requests.post(f"{DB_SERVICE_URL}/api/log-login/{username}")
     return res.status_code == 200
 
 

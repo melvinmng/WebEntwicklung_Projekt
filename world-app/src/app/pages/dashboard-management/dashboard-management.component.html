@@ -15,6 +15,10 @@
         <h2>Wunschorte je Nutzer</h2>
         <canvas id="wishLocChart"></canvas>
       </div>
+      <div class="chart-box">
+        <h2>Seitenbesuche (letzte 6 Wochen)</h2>
+        <canvas id="loginChart"></canvas>
+      </div>
       <div class="kpi-wrapper" *ngIf="stats">
         <p><strong>Registrierte Nutzer:</strong> {{ stats.total_users }}</p>
         <p><strong>Ø besuchte Orte pro Nutzer:</strong> {{ stats.avg_user_locations | number:'1.1-1' }}</p>

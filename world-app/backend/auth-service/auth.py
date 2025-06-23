@@ -5,6 +5,7 @@ from models import (
     register_user,
     get_password_hash,
     update_user,
+    add_login,
 )
 
 auth_bp = Blueprint("auth", __name__)
@@ -39,6 +40,7 @@ def login():
     if not stored_hash or not verify_password(password, stored_hash):
         return jsonify({"error": "Ungültige Anmeldedaten"}), 401
 
+    add_login(username)
     return jsonify({"message": "Login erfolgreich"}), 200
 
 
