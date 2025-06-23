@@ -2,6 +2,9 @@
 
 <!-- Karte -->
 <div id="map"></div>
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="loading-spinner"></div>
+</div>
 <app-navbar></app-navbar>
 <app-ai-toolbar
   [map]="map"
@@ -60,6 +63,12 @@
       <label>
         <input type="checkbox" [checked]="markerVisibility.wishlist" (change)="toggleMarkerVisibility('wishlist')" />
         🟣 Wunschliste
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" [checked]="markerVisibility.airport" (change)="toggleMarkerVisibility('airport')" />
+        🟠 Flughäfen
       </label>
     </li>
     <li>

@@ -5,12 +5,14 @@ import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AiToolbarComponent } from '../ai-toolbar/ai-toolbar.component';
+import { MarkerType } from '../../types/marker-type';
 
 const countries: FeatureCollection = countriesData as FeatureCollection;
-type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist';
 
 @Component({
   selector: 'app-map',
@@ -31,13 +33,18 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   public allMarkers: { marker: L.Marker, type: MarkerType }[] = [];
   public removedMarkersStack: { lat: number, lon: number, type: MarkerType, data: any }[] = [];
   public isLoading: boolean = false;
+  private flightMarkers: L.Marker[] = [];
+  private flightPath?: L.Polyline;
+  private planeMarker?: L.Marker;
+  private planeInterval: any = null;
   private initialView = { lat: 20, lon: 0, zoom: 2 };
   public markerVisibility: Record<MarkerType, boolean> = {
     user: true,
     safe: true,
     experimental: true,
     hidden: true,
-    wishlist: true
+    wishlist: true,
+    airport: true
   };
   private username: string = localStorage.getItem('currentUser') || '';
   private suppressSync = false;
@@ -133,31 +140,46 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   private addMapButtons(): void {
     const mapContainer = document.querySelector('.leaflet-bottom.leaflet-left');
     if (!mapContainer) return;
-
+  
     const group = document.createElement('div');
     group.className = 'leaflet-bar leaflet-control leaflet-custom-group';
-
+  
+    L.DomEvent.disableClickPropagation(group);
+  
     const undo = document.createElement('a');
     undo.innerHTML = '↩️';
     undo.title = 'Letzten Marker wiederherstellen';
     undo.className = 'leaflet-custom-button';
-    undo.onclick = e => { e.preventDefault(); this.restoreLastMarker(); };
-
+    undo.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.restoreLastMarker();
+    };
+  
     const home = document.createElement('a');
     home.innerHTML = '🏠';
     home.title = 'Zur Startansicht';
     home.className = 'leaflet-custom-button';
-    home.onclick = e => { e.preventDefault(); this.goHome(); };
-
+    home.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.goHome();
+    };
+  
     const clear = document.createElement('a');
     clear.innerHTML = '🗑️';
     clear.title = 'Alle Orte zurücksetzen';
     clear.className = 'leaflet-custom-button';
-    clear.onclick = e => { e.preventDefault(); this.clearLocations(); };
-
+    clear.onclick = e => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.clearLocations();
+    };
+  
     group.appendChild(clear);
     group.appendChild(undo);
     group.appendChild(home);
+  
     mapContainer.appendChild(group);
   }
 
@@ -188,7 +210,8 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
       safe: 'yellow',
       experimental: 'blue',
       hidden: 'green',
-      wishlist: 'violet'
+      wishlist: 'violet',
+      airport: 'orange'
     };
     return L.icon({
       iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${colors[type]}.png`,
@@ -263,28 +286,70 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private loadUserMarkers(): void {
     this.suppressSync = true;
+    this.isLoading = true;
     this.http.get<any>(`http://localhost:5004/api/db-read/USER/${this.username}`)
       .subscribe({
         next: data => {
+          const requests: any[] = [];
           if (data.USERLOC) {
             data.USERLOC.forEach((l: any) => {
-              this.addMarker(l.lat, l.lon, 'user');
-              this.getLocationDetails(l.lat, l.lon);
+              const req = this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${l.lat}&lon=${l.lon}`)
+                .pipe(tap(res => {
+                  const city = res.city || 'Unbekannt';
+                  const country = res.country || 'Unbekannt';
+                  this.addMarker(l.lat, l.lon, 'user', city, country);
+                }));
+              requests.push(req);
             });
           }
           if (data.WISHLOC) {
             data.WISHLOC.forEach((l: any) => {
-              this.getWishlistLocationDetails(l.lat, l.lon);
+              const req = this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${l.lat}&lon=${l.lon}`)
+                .pipe(tap(res => {
+                  const city = res.city || 'Unbekannt';
+                  const country = res.country || 'Unbekannt';
+                  this.addMarker(l.lat, l.lon, 'wishlist', city, country);
+                }));
+              requests.push(req);
             });
           }
+          if (requests.length) {
+            forkJoin(requests).subscribe({
+              complete: () => {
+                this.suppressSync = false;
+                this.isLoading = false;
+              },
+              error: () => {
+                this.suppressSync = false;
+                this.isLoading = false;
+              }
+            });
+          } else {
+            this.suppressSync = false;
+            this.isLoading = false;
+          }
         },
-        complete: () => this.suppressSync = false,
-        error: () => this.suppressSync = false
+        error: () => {
+          this.suppressSync = false;
+          this.isLoading = false;
+        }
       });
   }
 
   toggleMarkerVisibility(type: MarkerType): void {
     this.markerVisibility[type] = !this.markerVisibility[type];
+    if (type === 'airport') {
+      this.flightMarkers.forEach(m => {
+        this.markerVisibility[type] ? m.addTo(this.map) : m.remove();
+      });
+      if (this.flightPath) {
+        this.markerVisibility[type] ? this.flightPath.addTo(this.map) : this.flightPath.remove();
+      }
+      if (this.planeMarker) {
+        this.markerVisibility[type] ? this.planeMarker.addTo(this.map) : this.planeMarker.remove();
+      }
+      return;
+    }
     this.allMarkers.forEach(({ marker, type: t }) => {
       if (t === type) {
         this.markerVisibility[t] ? marker.addTo(this.map) : marker.remove();
@@ -308,6 +373,95 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     this.allMarkers = [];
     this.removedMarkersStack = [];
     this.syncToDatabase();
+    this.clearFlightVisualization();
+  }
+
+  private hideAllMarkers(): void {
+    this.allMarkers.forEach(m => m.marker.remove());
+  }
+
+  clearFlightVisualization(): void {
+    this.flightMarkers.forEach(m => this.map.removeLayer(m));
+    this.flightMarkers = [];
+    if (this.flightPath) {
+      this.map.removeLayer(this.flightPath);
+      this.flightPath = undefined;
+    }
+    if (this.planeMarker) {
+      this.map.removeLayer(this.planeMarker);
+      this.planeMarker = undefined;
+    }
+    if (this.planeInterval) {
+      clearInterval(this.planeInterval);
+      this.planeInterval = null;
+    }
+  }
+
+  private createAirportMarker(lat: number, lon: number): L.Marker {
+    const marker = L.marker([lat, lon], {
+      icon: this.getIcon('airport'),
+      interactive: false
+    });
+    if (this.markerVisibility['airport']) marker.addTo(this.map);
+    return marker;
+  }
+
+  private createArc(start: [number, number], end: [number, number], heightFactor = 0.2, steps = 100): L.LatLngExpression[] {
+    const [lat1, lon1] = start;
+    const [lat2, lon2] = end;
+    const points: L.LatLngExpression[] = [];
+    const dx = lat2 - lat1;
+    const dy = lon2 - lon1;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const height = dist * heightFactor;
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      let lat = lat1 + dx * t;
+      let lon = lon1 + dy * t;
+      const offset = 4 * height * t * (1 - t);
+      lat += (-dy / dist) * offset;
+      lon += (dx / dist) * offset;
+      points.push([lat, lon]);
+    }
+    return points;
+  }
+
+  private animatePlane(points: L.LatLngExpression[]): void {
+    if (this.planeInterval) {
+      clearInterval(this.planeInterval);
+      this.planeInterval = null;
+    }
+    if (this.planeMarker) {
+      this.map.removeLayer(this.planeMarker);
+    }
+    if (!points.length) return;
+    const icon = L.divIcon({ className: '', html: '✈️', iconSize: [48, 48] });
+    const marker = L.marker(points[0], { icon, interactive: false });
+    if (this.markerVisibility['airport']) marker.addTo(this.map);
+    this.planeMarker = marker;
+    let idx = 0;
+    let dir = 1;
+    this.planeInterval = setInterval(() => {
+      idx += dir;
+      if (idx >= points.length - 1) {
+        dir = -1;
+      } else if (idx <= 0) {
+        dir = 1;
+      }
+      marker.setLatLng(points[idx] as L.LatLngExpression);
+    }, 50);
+  }
+
+  showFlight(origin: { lat: number; lon: number }, dest: { lat: number; lon: number }): void {
+    this.clearFlightVisualization();
+    this.hideAllMarkers();
+    const m1 = this.createAirportMarker(origin.lat, origin.lon);
+    const m2 = this.createAirportMarker(dest.lat, dest.lon);
+    this.flightMarkers = [m1, m2];
+    const arc = this.createArc([origin.lat, origin.lon], [dest.lat, dest.lon]);
+    this.flightPath = L.polyline(arc, { color: 'orange', weight: 2 });
+    if (this.markerVisibility['airport']) this.flightPath.addTo(this.map);
+    this.animatePlane(arc);
   }
 
   legendVisible = false;
