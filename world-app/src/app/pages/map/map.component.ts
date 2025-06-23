@@ -5,6 +5,8 @@ import countriesData from '../../data/countries.geo.json';
 import { FeatureCollection } from 'geojson';
 import { HttpClient } from '@angular/common/http';
 import { HttpClientModule } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AiToolbarComponent } from '../ai-toolbar/ai-toolbar.component';
@@ -278,23 +280,53 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
 
   private loadUserMarkers(): void {
     this.suppressSync = true;
+    this.isLoading = true;
     this.http.get<any>(`http://localhost:5004/api/db-read/USER/${this.username}`)
       .subscribe({
         next: data => {
+          const requests: any[] = [];
           if (data.USERLOC) {
             data.USERLOC.forEach((l: any) => {
-              this.addMarker(l.lat, l.lon, 'user');
-              this.getLocationDetails(l.lat, l.lon);
+              const req = this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${l.lat}&lon=${l.lon}`)
+                .pipe(tap(res => {
+                  const city = res.city || 'Unbekannt';
+                  const country = res.country || 'Unbekannt';
+                  this.addMarker(l.lat, l.lon, 'user', city, country);
+                }));
+              requests.push(req);
             });
           }
           if (data.WISHLOC) {
             data.WISHLOC.forEach((l: any) => {
-              this.getWishlistLocationDetails(l.lat, l.lon);
+              const req = this.http.get<any>(`http://localhost:5001/api/reverse-geocode?lat=${l.lat}&lon=${l.lon}`)
+                .pipe(tap(res => {
+                  const city = res.city || 'Unbekannt';
+                  const country = res.country || 'Unbekannt';
+                  this.addMarker(l.lat, l.lon, 'wishlist', city, country);
+                }));
+              requests.push(req);
             });
           }
+          if (requests.length) {
+            forkJoin(requests).subscribe({
+              complete: () => {
+                this.suppressSync = false;
+                this.isLoading = false;
+              },
+              error: () => {
+                this.suppressSync = false;
+                this.isLoading = false;
+              }
+            });
+          } else {
+            this.suppressSync = false;
+            this.isLoading = false;
+          }
         },
-        complete: () => this.suppressSync = false,
-        error: () => this.suppressSync = false
+        error: () => {
+          this.suppressSync = false;
+          this.isLoading = false;
+        }
       });
   }
 
