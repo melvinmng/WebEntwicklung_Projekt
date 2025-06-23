@@ -160,7 +160,7 @@ Um alle Dienste starten zu können, müssen einige API-Schlüssel in `.env`‑Da
 2. **Supabase API Key**
 
    * Erforderlich für den *DB-Service* und optional für den *Flight-Service*.
-   * Den API Key findest du in deinem Supabase-Projekt unter `Project Settings → API`.
+   * Den API Key findest du in deinem Supabase-Projekt unter `Project Settings → API Keys`. Nutzen Sie hier unbbedingt den Key mit den Hinweisen `service_role` `secret`
    * Datei für den DB-Service: `world-app/backend/db-service/.env`
 
      ```
