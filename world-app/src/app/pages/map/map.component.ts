@@ -10,9 +10,9 @@ import { tap } from 'rxjs/operators';
 
 import { NavbarComponent } from '../navbar/navbar.component';
 import { AiToolbarComponent } from '../ai-toolbar/ai-toolbar.component';
+import { MarkerType } from '../../types/marker-type';
 
 const countries: FeatureCollection = countriesData as FeatureCollection;
-type MarkerType = 'user' | 'safe' | 'experimental' | 'hidden' | 'wishlist' | 'airport';
 
 @Component({
   selector: 'app-map',
@@ -398,7 +398,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
       icon: this.getIcon('airport'),
       interactive: false
     });
-    if (this.markerVisibility.airport) marker.addTo(this.map);
+    if (this.markerVisibility['airport']) marker.addTo(this.map);
     return marker;
   }
 
@@ -433,7 +433,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     if (!points.length) return;
     const icon = L.divIcon({ className: '', html: '✈️', iconSize: [24, 24] });
     const marker = L.marker(points[0], { icon, interactive: false });
-    if (this.markerVisibility.airport) marker.addTo(this.map);
+    if (this.markerVisibility['airport']) marker.addTo(this.map);
     this.planeMarker = marker;
     let idx = 0;
     this.planeInterval = setInterval(() => {
@@ -454,7 +454,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     this.flightMarkers = [m1, m2];
     const arc = this.createArc([origin.lat, origin.lon], [dest.lat, dest.lon]);
     this.flightPath = L.polyline(arc, { color: 'orange', weight: 2 });
-    if (this.markerVisibility.airport) this.flightPath.addTo(this.map);
+    if (this.markerVisibility['airport']) this.flightPath.addTo(this.map);
     this.animatePlane(arc);
   }
 
