@@ -72,9 +72,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
   initCharts() {
     if (!this.stats) return;
 
-    const users = Object.keys(this.stats.user_location_counts || {});
-    const locCounts = Object.values(this.stats.user_location_counts || {});
-    const wishCounts = Object.values(this.stats.wish_location_counts || {});
+    // Determine the top users for each category to avoid overcrowded charts
+    const userLocEntries = Object.entries(this.stats.user_location_counts || {})
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .slice(0, 5);
+    const wishLocEntries = Object.entries(this.stats.wish_location_counts || {})
+      .sort((a, b) => (b[1] as number) - (a[1] as number))
+      .slice(0, 5);
+
+    const locUsers = userLocEntries.map(([u]) => u);
+    const locCounts = userLocEntries.map(([, c]) => c as number);
+    const wishUsers = wishLocEntries.map(([u]) => u);
+    const wishCounts = wishLocEntries.map(([, c]) => c as number);
 
     const ctx1 = (document.getElementById('userLocChart') as HTMLCanvasElement)?.getContext('2d');
     const ctx2 = (document.getElementById('wishLocChart') as HTMLCanvasElement)?.getContext('2d');
@@ -87,8 +96,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.userLocChart = new Chart(ctx1, {
         type: 'bar',
         data: {
-          labels: users,
-          datasets: [{ label: 'Besuchte Orte', data: locCounts as number[] }]
+          labels: locUsers,
+          datasets: [{ label: 'Besuchte Orte', data: locCounts }]
         },
         options: { responsive: true }
       });
@@ -101,8 +110,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.wishLocChart = new Chart(ctx2, {
         type: 'bar',
         data: {
-          labels: users,
-          datasets: [{ label: 'Wunschorte', data: wishCounts as number[] }]
+          labels: wishUsers,
+          datasets: [{ label: 'Wunschorte', data: wishCounts }]
         },
         options: { responsive: true }
       });
