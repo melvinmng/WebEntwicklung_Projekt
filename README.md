@@ -1,75 +1,120 @@
-# World App – Projekt starten & stoppen
+# World App
 
-## Abhängigkeiten installieren
-Gehen sie im Terminal auf den Ordner world-app (falls nötig):
-```bash
-cd world-app
-```
+> Eine Webanwendung zur Visualisierung deiner Reisen und zur Entdeckung neuer Ziele mittels KI.
 
-Installieren sie die Node Modules:
-```bash
-npm install
-```
+Dieses Projekt ermöglicht es, besuchte Orte und Wunschziele auf einer Weltkarte zu markieren und persönliche Reiseempfehlungen basierend auf diesen Daten zu erhalten.
 
-## Docker Compose
+## Inhaltsverzeichnis
 
-### Projekt starten
-
-```bash
-docker compose up --build
-```
-
-### Projekt stoppen
-
-```bash
-docker compose down
-```
-
-### Zugriff auf die App
-
-* **Frontend**: [http://localhost:4200](http://localhost:4200)
-* **API-Service**: [http://localhost:5001](http://localhost:5001)
-* **Auth-Service**: [http://localhost:5002](http://localhost:5002)
-* **Flight-Service**: [http://localhost:5003](http://localhost:5003)
-* **DB-Service**: [http://localhost:5004](http://localhost:5004)
-
-Der API-Service unterstützt optional den Parameter `username` bei
-`/api/recommendations`. Ist für diesen Nutzer ein individueller Gemini-Prompt in
-der Datenbank hinterlegt, wird er für die Generierung verwendet.
-
-> Stelle sicher, dass du im Projekt-Root arbeitest – dort, wo die `docker-compose.yml` liegt.
+- [Architektur & Services](#architektur--services)
+- [Voraussetzungen](#voraussetzungen)
+- [Einrichtung](#einrichtung)
+- [Projekt starten & stoppen](#projekt-starten--stoppen)
+  - [Docker Compose (Empfohlen)](#variante-1-docker-compose-empfohlen)
+  - [Kubernetes](#variante-2-kubernetes)
+- [Nutzung der App](#nutzung-der-app)
 
 ---
 
-## Kubernetes
+## Architektur & Services
 
-Die einzelnen Container lassen sich auch in einem Kubernetes-Cluster starten. Alle benötigten Ressourcen sind in `k8s/kubernetes.yaml` beschrieben. Das folgende Rezept führt Schritt für Schritt durch den Start mit einem lokalen Cluster (z. B. Minikube). Nutzen sie bitte **entweder Docker Compose oder Kubernetes, da beide auf denselben Ports laufen**, was zu erheblichen Problemen führen kann.
+Das Projekt besteht aus mehreren Microservices, die zusammen die Funktionalität der World App bereitstellen.
 
-**0. Minikube installieren**
-Für unser Beispiel nutzen wir Minikube, dies kann auf dem Mac mittels Homebrew installiert werden:
+| Service        | Port      | URL (Lokal)                 | Beschreibung                                                                                              |
+| :------------- | :-------- | :-------------------------- | :-------------------------------------------------------------------------------------------------------- |
+| **Frontend**   | `4200`    | `http://localhost:4200`     | Angular-Anwendung, die das User Interface bereitstellt.                                                   |
+| **API-Service**| `5001`    | `http://localhost:5001`     | Haupt-API, die KI-Empfehlungen über Gemini generiert.                                                     |
+| **Auth-Service**| `5002`    | `http://localhost:5002`     | Verantwortlich für die Authentifizierung und Benutzerverwaltung.                                          |
+| **Flight-Service**| `5003` | `http://localhost:5003`     | Stellt Flugdaten und Informationen bereit.                                                                |
+| **DB-Service** | `5004`    | `http://localhost:5004`     | Verwaltet die Datenbankinteraktionen über eine Supabase-Anbindung.                                        |
+
+---
+
+## Voraussetzungen
+
+Stelle sicher, dass die folgenden Werkzeuge auf deinem System installiert sind:
+
+- **Node.js und npm**: Zur Installation der Frontend-Abhängigkeiten.
+- **Docker und Docker Compose**: Zum einfachen Starten der gesamten Anwendung.
+- **(Optional) Minikube und kubectl**: Falls du das Projekt mit Kubernetes ausführen möchtest.
+
+---
+
+## Einrichtung
+
+### 1. API-Keys konfigurieren
+
+Für den vollen Funktionsumfang sind API-Schlüssel für Google Gemini und Supabase erforderlich.
+
+Lege für die folgenden Services jeweils eine `.env`-Datei im angegebenen Verzeichnis an:
+
+1.  **Gemini API Key** (benötigt vom API-Service)
+    -   Erstelle die Datei: `world-app/backend/api-service/.env`
+    -   Inhalt:
+        ```
+        GEMINI_API_KEY=DEIN_GOOGLE_AI_STUDIO_KEY
+        ```
+    -   Den Schlüssel erhältst du im [Google AI Studio](https://aistudio.google.com/app/apikey).
+
+2.  **Supabase API Key** (benötigt vom DB-Service)
+    -   Erstelle die Datei: `world-app/backend/db-service/.env`
+    -   Inhalt:
+        ```
+        SUPABASE_API_KEY=DEIN_SUPABASE_SERVICE_ROLE_KEY
+        ```
+    -   Den `service_role` Key findest du in deinem Supabase-Projekt unter `Project Settings → API`.
+
+### 2. Node.js Abhängigkeiten installieren
+
+Wechsle in das Frontend-Verzeichnis und installiere die `node_modules`.
 
 ```bash
-brew install minikube
+cd world-app
+npm install
 ```
 
-Bei der Installation auf anderen Betriebssystemen kann ChatGPT sicherlich helfen :).
+---
 
-**1. Cluster starten**
+## Projekt starten & stoppen
 
+Du kannst das Projekt entweder mit Docker Compose oder Kubernetes starten.
+
+### Variante 1: Docker Compose (Empfohlen)
+
+Stelle sicher, dass du dich im **Projekt-Root-Verzeichnis** befindest (dort, wo die `docker-compose.yml` liegt), nicht im `world-app`-Ordner.
+
+**Projekt starten:**
+```bash
+# Baut die Images und startet alle Container
+docker compose up --build
+```
+
+**Projekt stoppen:**
+```bash
+# Stoppt und entfernt die Container
+docker compose down
+```
+
+### Variante 2: Kubernetes
+
+<details>
+<summary>Anleitung für Kubernetes mit Minikube (zum Ausklappen klicken)</summary>
+
+> **Hinweis:** Nutze entweder Docker Compose oder Kubernetes, da beide dieselben Ports verwenden, was zu Konflikten führen kann.
+
+**1. Minikube starten**
 ```bash
 minikube start
 ```
 
 **2. Docker-Umgebung des Clusters aktivieren**
-So landen die gebauten Images direkt im richtigen Docker-Daemon (wichtig, da im Manifest `imagePullPolicy: Never` gesetzt ist):
-
+Damit die gebauten Images direkt im Cluster verfügbar sind:
 ```bash
 eval $(minikube docker-env)
 ```
 
 **3. Container-Images bauen**
-Folgende Befehle können als ganzes ins Terminal eingegeben werden. Wichtig ist, dass sich das Terminal auf den übergeordneten Pfad (WEBENTWICKLUNG_PROJEKT) bezieht, nicht auf den world-app Ordner.
-
+Führe diese Befehle im **Projekt-Root** aus:
 ```bash
 docker build -t api-service:latest world-app/backend/api-service
 docker build -t auth-service:latest world-app/backend/auth-service
@@ -79,97 +124,52 @@ docker build -t frontend:latest world-app
 ```
 
 **4. Ressourcen im Cluster anlegen**
-
 ```bash
 kubectl apply -f k8s/kubernetes.yaml
 ```
 
-**5. Prüfen, ob alle Pods laufen** (optional)
-
+**5. Zugriff auf die App via Port-Forwarding**
+Öffne für jeden der folgenden Befehle ein **separates Terminalfenster**:
 ```bash
-kubectl get pods
-```
-
-**6. Zugriff auf das Frontend**
-
-### ⚠️ Hinweis zu NodePort und lokalem Zugriff
-
-Die im Kubernetes-Manifest definierten Services nutzen `type: NodePort` – das öffnet einen Port auf dem Kubernetes-Node, aber dieser ist nicht immer direkt auf deinem lokalen Rechner (`localhost`) erreichbar, da Kubernetes meist in einer VM läuft (z. B. bei Docker Desktop oder Minikube).
-
-#### **Empfohlene Variante: Port-Forwarding**
-
-Starte ein Port-Forwarding für den Frontend-Service, sowie alle anderen Services (somit können diese auch mit localhost aufgerufen werden). Jeder der folgenden Befehle muss in einem separaten Terminal ausgeführt werden:
-
-```bash
+kubectl port-forward service/frontend 4200:80
 kubectl port-forward service/api-service 5001:5001
 kubectl port-forward service/auth-service 5002:5002
 kubectl port-forward service/flight-service 5003:5003
 kubectl port-forward service/db-service 5004:5004
-kubectl port-forward service/frontend 4200:80
 ```
+Anschließend ist das Frontend unter **[http://localhost:4200](http://localhost:4200)** erreichbar.
 
-Danach kannst du **[http://localhost:4200](http://localhost:4200)** im Browser aufrufen und das Frontend nutzen.
-
-
-
-**7. Cluster aufräumen**
-
+**6. Cluster aufräumen**
 ```bash
+# Ressourcen löschen
 kubectl delete -f k8s/kubernetes.yaml
-```
 
-**8. Minikube stoppen**
-
-```bash
+# Minikube stoppen
 minikube stop
-# optional: entfernt das Cluster komplett
-minikube delete
-# Falls du die Docker-Umgebung aus Schritt 2 aktiviert hast,
-# kannst du sie damit wieder deaktivieren:
+
+# Docker-Umgebung deaktivieren
 eval $(minikube docker-env -u)
 ```
-
-## Nutzung der Karte
-
-Auf der Karte kannst du per **Linksklick** einen roten Marker für bereits besuchte Orte setzen. Ein **Rechtsklick** erzeugt einen violetten Marker für die Wunschliste. Ein Klick auf einen Marker entfernt ihn wieder.
-
-Nach dem Generieren von Empfehlungen erscheinen weitere Marker:
-
-* 🟡 **Safe** – bewährte Reiseziele
-* 🔵 **Experimental** – etwas ausgefallenere Vorschläge
-* 🟢 **Geheimtipp** – eher unbekannte Orte, die dennoch zu dir passen könnten
-
-Die **Legende** unten rechts blendet einzelne Markertypen ein oder aus.
-Links unten findest du zusätzliche Buttons, um alle Marker zu löschen, den letzten Marker wiederherzustellen oder zur Startansicht zurückzukehren.
+</details>
 
 ---
 
-## Benötigte API-Keys
+## Nutzung der App
 
-Um alle Dienste starten zu können, müssen einige API-Schlüssel in `.env`‑Dateien abgelegt werden. Die Dateien liegen jeweils im Verzeichnis des entsprechenden Service (neben `app.py`). Falls sie noch nicht existieren, lege sie an.
+### Kartennutzung
 
-1. **Gemini API Key**
+-   **Linksklick:** Setzt einen roten Marker (besuchter Ort).
+-   **Rechtsklick:** Setzt einen violetten Marker (Wunschziel).
+-   **Klick auf Marker:** Entfernt den Marker.
 
-   * Benötigt vom *API-Service* zur Generierung der Reisetipps.
-   * Den Schlüssel erhältst du im [Google AI Studio](https://aistudio.google.com/app/apikey).
-   * Datei: `world-app/backend/api-service/.env`
+### KI-Empfehlungen
 
-     ```
-     GEMINI_API_KEY=DEIN_KEY
-     ```
+Nachdem du Marker gesetzt hast, kannst du über die AI-Toolbar Empfehlungen generieren lassen. Diese erscheinen als neue Marker auf der Karte:
 
-2. **Supabase API Key**
+-   🟡 **Safe:** Bewährte Reiseziele.
+-   🔵 **Experimental:** Ausgefallenere Vorschläge.
+-   🟢 **Geheimtipp:** Unbekannte Orte, die zu dir passen könnten.
 
-   * Erforderlich für den *DB-Service* und optional für den *Flight-Service*.
-   * Den API Key findest du in deinem Supabase-Projekt unter `Project Settings → API Keys`. Nutzen Sie hier unbbedingt den Key mit den Hinweisen `service_role` `secret`
-   * Datei für den DB-Service: `world-app/backend/db-service/.env`
-
-     ```
-     SUPABASE_API_KEY=DEIN_KEY
-     ```
-   * Optional kann der *Flight-Service* die gleiche Datei `world-app/backend/flight-service/.env` mit folgendem Inhalt nutzen (hier reicht aber auch der öffentliche Key im Code selbst):
-
-     ```
-     SUPABASE_API_KEY=DEIN_KEY
-     ```
+Über die **Legende** (unten rechts) können einzelne Marker-Typen gefiltert werden.
+Zusätzliche Buttons (unten links) ermöglichen das Löschen aller Marker, das Wiederherstellen des letzten gelöschten Markers und das Zurücksetzen der Kartenansicht.
 
