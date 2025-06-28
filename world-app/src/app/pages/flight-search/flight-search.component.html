@@ -43,8 +43,11 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
+            <label>
+                <input type="checkbox" [(ngModel)]="autoIata" name="autoIata" /> Automatische IATA-Suche
+            </label>
             <label>Flughafen- bzw. Städtename (falls IATA-Code nicht bekannt)
-                <input [(ngModel)]="airportNameSearch" name="airportNameSearch" 
+                <input [(ngModel)]="airportNameSearch" name="airportNameSearch"
                 placeholder="z. B. Stuttgart"/>
             </label>
             <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>

@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
 import { forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -42,23 +42,34 @@ export class FlightSearchComponent {
   airportNameSearch = '';
   iataSearchError = '';
   isLoading = false;
+  autoIata = true;
 
   private resolveIata(input: string) {
-    if (input && input.length === 3) {
-      return this.http.get<{iata_codes: string[]}>(
-        `http://localhost:5003/airport-code?name=${encodeURIComponent(input)}`
-      ).pipe(
-        map(res => res.iata_codes?.[0] || input.toUpperCase()),
-        catchError(() => of(input.toUpperCase()))
-      );
-    }
     if (!input) return of('');
-    return this.http.get<{ iata_codes: string[] }>(
-      `http://localhost:5003/airport-code?name=${encodeURIComponent(input)}`
-    ).pipe(
-      map(res => res.iata_codes?.[0] || ''),
-      catchError(() => of(''))
-    );
+
+    const code = input.toUpperCase();
+
+    if (!this.autoIata) {
+      return of(code);
+    }
+
+    return this.http
+      .get<any>(`http://localhost:5003/airport-details?code=${encodeURIComponent(code)}`)
+      .pipe(
+        map(() => code),
+        catchError(() => of(null)),
+        switchMap(found => {
+          if (found) {
+            return of(code);
+          }
+          return this.http
+            .get<{ iata_codes: string[] }>(`http://localhost:5003/airport-code?name=${encodeURIComponent(input)}`)
+            .pipe(
+              map(res => res.iata_codes?.[0] || ''),
+              catchError(() => of(''))
+            );
+        })
+      );
   }
 
 
