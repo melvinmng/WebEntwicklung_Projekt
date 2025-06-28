@@ -1,7 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
@@ -40,7 +41,25 @@ export class FlightSearchComponent {
   foundIataCodes: string[] = [];
   airportNameSearch = '';
   iataSearchError = '';
-   isLoading = false;
+  isLoading = false;
+
+  private resolveIata(input: string) {
+    if (input && input.length === 3) {
+      return this.http.get<{iata_codes: string[]}>(
+        `http://localhost:5003/airport-code?name=${encodeURIComponent(input)}`
+      ).pipe(
+        map(res => res.iata_codes?.[0] || input.toUpperCase()),
+        catchError(() => of(input.toUpperCase()))
+      );
+    }
+    if (!input) return of('');
+    return this.http.get<{ iata_codes: string[] }>(
+      `http://localhost:5003/airport-code?name=${encodeURIComponent(input)}`
+    ).pipe(
+      map(res => res.iata_codes?.[0] || ''),
+      catchError(() => of(''))
+    );
+  }
 
 
   validateBookingFields(): boolean {
@@ -120,41 +139,57 @@ export class FlightSearchComponent {
     }
     this.isLoading = true;
     this.bookingError = '';
-    const params = new URLSearchParams({
-      from_airport: this.flightOrigin,
-      to_airport: this.flightDestination,
-      date: this.flightDate,
-      trip: this.flightTrip,
-      seat: this.flightSeat,
-      adults: this.flightAdults.toString(),
-      children: this.flightChildren.toString(),
-    });
-    this.http
-      .get(`http://localhost:5003/flight-search?${params.toString()}`)
-      .subscribe({
-        next: (data: any) => {
-          this.flightResults = data;
-          if (data && data.error) {
-            this.flightError = data.error;
-            this.flightResultsList = [];
-          } else {
-            this.flightError = '';
-            this.flightResultsList = (data?.flights || []).sort(
-              (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
-            );
-          }
-          this.flightResultsVisible = true;
-          this.isLoading = false;
-          this.showFlightOnMap();
-        },
-        error: (err: HttpErrorResponse) => {
-          this.flightError = err.error?.error || 'Fehler bei der Abfrage';
-          this.flightResultsList = [];
-          this.flightResultsVisible = true;
-          this.isLoading = false;
-          this.showFlightOnMap();
-        }
+
+    forkJoin([
+      this.resolveIata(this.flightOrigin),
+      this.resolveIata(this.flightDestination),
+    ]).subscribe(([originCode, destCode]) => {
+      if (!originCode || !destCode) {
+        this.isLoading = false;
+        this.flightError = 'Flughafen nicht gefunden';
+        this.flightResultsList = [];
+        this.flightResultsVisible = true;
+        return;
+      }
+      this.flightOrigin = originCode;
+      this.flightDestination = destCode;
+
+      const params = new URLSearchParams({
+        from_airport: originCode,
+        to_airport: destCode,
+        date: this.flightDate,
+        trip: this.flightTrip,
+        seat: this.flightSeat,
+        adults: this.flightAdults.toString(),
+        children: this.flightChildren.toString(),
       });
+
+      this.http.get(`http://localhost:5003/flight-search?${params.toString()}`)
+        .subscribe({
+          next: (data: any) => {
+            this.flightResults = data;
+            if (data && data.error) {
+              this.flightError = data.error;
+              this.flightResultsList = [];
+            } else {
+              this.flightError = '';
+              this.flightResultsList = (data?.flights || []).sort(
+                (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
+              );
+            }
+            this.flightResultsVisible = true;
+            this.isLoading = false;
+            this.showFlightOnMap();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.flightError = err.error?.error || 'Fehler bei der Abfrage';
+            this.flightResultsList = [];
+            this.flightResultsVisible = true;
+            this.isLoading = false;
+            this.showFlightOnMap();
+          }
+        });
+    });
   }
 
   // ----- Booking URL -----
@@ -213,12 +248,12 @@ export class FlightSearchComponent {
 
   private showFlightOnMap(): void {
     if (!this.mapComponent) return;
-    const originReq = this.http.get<any[]>(`http://localhost:5001/api/search?query=${this.flightOrigin}%20airport`);
-    const destReq = this.http.get<any[]>(`http://localhost:5001/api/search?query=${this.flightDestination}%20airport`);
+    const originReq = this.http.get<any>(`http://localhost:5003/airport-details?code=${this.flightOrigin}`);
+    const destReq = this.http.get<any>(`http://localhost:5003/airport-details?code=${this.flightDestination}`);
     forkJoin([originReq, destReq]).subscribe(([o, d]) => {
-      if (!o.length || !d.length) return;
-      const origin = { lat: parseFloat(o[0].lat), lon: parseFloat(o[0].lon) };
-      const dest = { lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon) };
+      if (!o || !d) return;
+      const origin = { lat: parseFloat(o.latitude_deg), lon: parseFloat(o.longitude_deg) };
+      const dest = { lat: parseFloat(d.latitude_deg), lon: parseFloat(d.longitude_deg) };
       this.mapComponent.showFlight(origin, dest);
       this.mapComponent.map.fitBounds([[origin.lat, origin.lon], [dest.lat, dest.lon]]);
     });
