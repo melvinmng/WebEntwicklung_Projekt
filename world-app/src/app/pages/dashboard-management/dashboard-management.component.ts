@@ -43,7 +43,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private fetchStats() {
-    this.http.get<any>('http://localhost:5004/api/stats', { headers: { 'Cache-Control': 'no-cache' } }).subscribe({
+    const username = localStorage.getItem('currentUser') || '';
+    const statsUrl = username
+      ? `http://localhost:5004/api/stats?username=${encodeURIComponent(username)}`
+      : 'http://localhost:5004/api/stats';
+    this.http.get<any>(statsUrl, { headers: { 'Cache-Control': 'no-cache' } }).subscribe({
       next: data => {
         this.stats = data;
         setTimeout(() => this.initCharts(), 0);
@@ -51,7 +55,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       error: err => console.error('Fehler beim Abrufen der Statistiken', err)
     });
 
-    this.http.get<any>('http://localhost:5004/api/login-stats').subscribe({
+    const loginUrl = username
+      ? `http://localhost:5004/api/login-stats?username=${encodeURIComponent(username)}`
+      : 'http://localhost:5004/api/login-stats';
+    this.http.get<any>(loginUrl).subscribe({
       next: data => {
         this.loginData = data;
         setTimeout(() => this.initLoginChart(), 0);

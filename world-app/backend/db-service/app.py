@@ -122,13 +122,22 @@ def update_user_data(username):
 
 @app.route("/api/stats", methods=["GET"])
 def get_stats():
-    """Aggregierte Kennzahlen aus der Benutzerdatenbank."""
+    """Aggregierte Kennzahlen aus der Benutzerdatenbank oder fuer einen Benutzer."""
     headers = {
         "apikey": SUPABASE_API_KEY,
         "Authorization": f"Bearer {SUPABASE_API_KEY}",
     }
 
-    response = requests.get(f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers)
+    username = request.args.get("username")
+
+    if username:
+        params = {"USER": f"eq.{username}"}
+    else:
+        params = None
+
+    response = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers, params=params
+    )
 
     if response.status_code != 200:
         return (
@@ -210,12 +219,33 @@ def login_stats():
         "Authorization": f"Bearer {SUPABASE_API_KEY}",
     }
 
-    res = requests.get(f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers)
+    username = request.args.get("username")
+    if username:
+        params = {"USER": f"eq.{username}", "select": "LOGINS"}
+    else:
+        params = None
+
+    res = requests.get(
+        f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}", headers=headers, params=params
+    )
     if res.status_code != 200:
         return jsonify({"error": "Fehler beim Abrufen", "details": res.text}), 500
 
     entries = res.json()
     cutoff = datetime.utcnow() - timedelta(weeks=6)
+
+    if username:
+        logins = []
+        if entries:
+            logins = entries[0].get("LOGINS", []) or []
+        cleaned = [d for d in logins if _parse_date(d) >= cutoff]
+        dates = [
+            (datetime.utcnow().date() - timedelta(days=i)).isoformat()
+            for i in reversed(range(42))
+        ]
+        series = [cleaned.count(d) for d in dates]
+        return jsonify({"dates": dates, "counts": series})
+
     counts = {}
     for entry in entries:
         username = entry.get("USER")
