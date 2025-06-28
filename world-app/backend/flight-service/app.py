@@ -100,5 +100,35 @@ def get_airport_code():
     return jsonify({"iata_codes": iata_codes})
 
 
+@app.route("/airport-details", methods=["GET"])
+def get_airport_details():
+    code = request.args.get("code")
+    name = request.args.get("name")
+    if not code and not name:
+        return jsonify({"error": "code or name required"}), 400
+
+    headers = {"apikey": SUPABASE_API_KEY}
+    if code:
+        query = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=name,iata_code,latitude_deg,longitude_deg&iata_code=eq.{code.upper()}"
+    else:
+        query = f"{SUPABASE_URL}/rest/v1/{TABLE_NAME}?select=name,iata_code,latitude_deg,longitude_deg&name=ilike.*{name}*"
+
+    response = requests.get(query, headers=headers)
+    if response.status_code != 200:
+        return jsonify({"error": "Fehler beim Supabase-Request!", "details": response.text}), 500
+
+    data = response.json()
+    if not data:
+        return jsonify({"error": "Kein Flughafen gefunden!"}), 404
+
+    entry = data[0]
+    return jsonify({
+        "name": entry.get("name"),
+        "iata_code": entry.get("iata_code"),
+        "latitude_deg": entry.get("latitude_deg"),
+        "longitude_deg": entry.get("longitude_deg"),
+    })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003)

@@ -18,7 +18,7 @@ import { NavbarComponent } from '../navbar/navbar.component';
   styleUrls: ['./account-management.component.css']
 })
 export class AccountManagementComponent implements OnInit {
-  username = localStorage.getItem('username') || '';
+  username = localStorage.getItem('currentUser') || '';
 
   newUsername = '';
   messageUser = '';
@@ -59,7 +59,7 @@ export class AccountManagementComponent implements OnInit {
       .subscribe({
         next: () => {
           this.messageUser = 'Benutzername erfolgreich geändert.';
-          localStorage.setItem('username', this.newUsername);
+          localStorage.setItem('currentUser', this.newUsername);
           this.username = this.newUsername;
           this.newUsername = '';
         },
