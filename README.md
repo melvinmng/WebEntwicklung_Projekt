@@ -177,7 +177,12 @@ Zusätzliche Buttons (unten links) ermöglichen das Löschen aller Marker, das W
 
 ## Fehlerbehebung
 
-Sollte es zu Anzeigefehlern, Problemen beim Login oder unerwartetem Verhalten im Dashboard kommen, leere bitte den **Cache deines Browsers**.
+Sollte es zu Anzeigefehlern, Problemen beim Login oder unerwartetem Verhalten im Dashboard kommen, leere bitte den **Cache deines Browsers**. Veraltete zwischengespeicherte Daten können häufig die Ursache für solche Probleme sein.
 
-Veraltete zwischengespeicherte Daten können häufig die Ursache für solche Probleme sein.
+### Firmenproxies
+
+Bei der Ausführung des Projekts in einem Firmennetzwerk kann es zu Problemen bei der Kommunikation zwischen den Services kommen, wenn ein Firmenproxy die Verbindungen blockiert oder umleitet. Dies kann sich durch Fehlermeldungen im Browser (z.B. `CORS-Fehler`) oder in den Logs der Backend-Services äußern.
+
+**Lösung:**
+Stelle sicher, dass die Kommunikation zu `localhost` auf den Ports `4200`, `5001`, `5002`, `5003` und `5004` nicht durch einen Proxy blockiert wird. Gegebenenfalls müssen Ausnahmen im Proxy- oder VPN-Client konfiguriert werden.
 
