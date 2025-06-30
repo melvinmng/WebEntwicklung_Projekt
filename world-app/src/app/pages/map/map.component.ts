@@ -57,7 +57,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    // Ensure the help overlay is visible each time the page is opened
+  
     localStorage.removeItem('hideMapInfo');
     this.infoVisible = false;
     document.addEventListener('click', this.onDocumentClick);
@@ -85,7 +85,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   private initMap(): void {
-    // Alten Container zurücksetzen (falls schon initialisiert)
+
     const container = L.DomUtil.get('map') as HTMLElement;
     if (container && (container as any)._leaflet_id) {
       (container as any)._leaflet_id = null;
@@ -100,40 +100,33 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
       maxBounds: [[-85, -180], [85, 180]],
       maxBoundsViscosity: 1.0,
       zoomControl: false,
-      dragging: true,      // ist eigentlich Default, aber zur Sicherheit
+      dragging: true,  
       touchZoom: false,
       tap: false
     }as any);
-  
-    // Zoom-Buttons unten links
+
     L.control.zoom({ position: 'bottomleft' }).addTo(this.map);
   
-    // OSM-Tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
   
-    // Länder-Grenzen
     L.geoJSON(this.countries, {
       style: { color: 'blue', weight: 1, fillOpacity: 0.1 }
     }).addTo(this.map);
-  
-    // Nach dem Einfügen ins DOM einmal die Größe aktualisieren
-    // → verhindert mögliche Probleme, wenn das Map-Div erst nach Darstellung seine Größe bekommt
+
     setTimeout(() => this.map.invalidateSize(), 0);
   
-    // Linksklick → regulärer "user"-Marker
+  
     this.map.on('click', (e: L.LeafletMouseEvent) => {
       this.addMarker(e.latlng.lat, e.latlng.lng, 'user');
       this.getLocationDetails(e.latlng.lat, e.latlng.lng);
     });
   
-    // Rechtsklick → "wishlist"-Marker
     this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
       this.getWishlistLocationDetails(e.latlng.lat, e.latlng.lng);
     });
 
-    // provide map instance to the toolbar component
     this.aiToolbarComponent.map = this.map;
   }
 
@@ -243,7 +236,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.allMarkers.push({ marker, type });
 
-    // If loaded with city/country, also add to selectedLocations
+   
     if ((type === 'user' || type === 'wishlist') && city && country) {
       if (!this.selectedLocations.some(l => l.lat === lat && l.lon === lon)) {
         this.selectedLocations.push({ city, country, lat, lon });
