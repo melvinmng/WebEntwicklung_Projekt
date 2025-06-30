@@ -1,5 +1,7 @@
 <div class="container">
-    <app-map [toolbarMode]="'flight'" (flightSearchRequested)="openFlightSearch()"></app-map>
+    <app-map [toolbarMode]="'flight'"
+             (flightSearchRequested)="openFlightSearch()"
+             (flightPinsSelected)="onFlightPinsSelected($event)"></app-map>
 
     <!-- Flug-Suchformular -->
     <div class="flight-search-overlay" *ngIf="flightFormVisible" (click)="closeFlightSearch()">

@@ -8,7 +8,9 @@ from fast_flights import (
     search_airport,  # not working correctly, using DB instead
 )
 import os
+import csv
 import requests
+from math import radians, sin, cos, sqrt, atan2
 
 import flask_monitoringdashboard as dashboard
 
@@ -16,6 +18,53 @@ app = Flask(__name__)
 dashboard.bind(app)
 dashboard.config.init_from(file="config.cfg")
 CORS(app)
+
+
+# ----------------------- Airport Helpers -----------------------
+AIRPORTS_DATA = None
+
+
+def load_airports():
+    """Load airport data from the CSV file once."""
+    global AIRPORTS_DATA
+    if AIRPORTS_DATA is not None:
+        return AIRPORTS_DATA
+
+    AIRPORTS_DATA = []
+    csv_path = os.path.join(os.path.dirname(__file__), "../../../airports.csv")
+    try:
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                code = row.get("iata_code")
+                if not code:
+                    continue
+                try:
+                    lat = float(row.get("latitude_deg", "0"))
+                    lon = float(row.get("longitude_deg", "0"))
+                except ValueError:
+                    continue
+                AIRPORTS_DATA.append(
+                    {
+                        "code": code,
+                        "name": row.get("name", ""),
+                        "lat": lat,
+                        "lon": lon,
+                    }
+                )
+    except FileNotFoundError:
+        AIRPORTS_DATA = []
+    return AIRPORTS_DATA
+
+
+def haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate the great circle distance in kilometers."""
+    r = 6371.0
+    phi1, phi2 = radians(lat1), radians(lat2)
+    dphi = radians(lat2 - lat1)
+    dlambda = radians(lon2 - lon1)
+    a = sin(dphi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(dlambda / 2) ** 2
+    return 2 * r * atan2(sqrt(a), sqrt(1 - a))
 
 
 @app.route("/flight-search", methods=["GET"])
@@ -122,6 +171,26 @@ def get_airport_details():
         "latitude_deg": entry.get("latitude_deg"),
         "longitude_deg": entry.get("longitude_deg"),
     })
+
+
+@app.route("/nearest-airports", methods=["GET"])
+def nearest_airports():
+    """Return the nearest airports for given coordinates."""
+    try:
+        lat = float(request.args.get("lat"))
+        lon = float(request.args.get("lon"))
+    except (TypeError, ValueError):
+        return jsonify({"error": "lat and lon required"}), 400
+
+    n = int(request.args.get("n", 3))
+    airports = load_airports()
+    results = []
+    for a in airports:
+        dist = haversine(lat, lon, a["lat"], a["lon"])
+        results.append({"code": a["code"], "name": a["name"], "distance_km": dist})
+
+    results.sort(key=lambda x: x["distance_km"])
+    return jsonify({"airports": results[:n]})
 
 
 if __name__ == "__main__":

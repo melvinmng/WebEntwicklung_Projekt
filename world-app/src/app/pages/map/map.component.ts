@@ -25,6 +25,10 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   @ViewChild(AiToolbarComponent) aiToolbarComponent!: AiToolbarComponent;
   @Input() toolbarMode: 'map' | 'flight' = 'map';
   @Output() flightSearchRequested = new EventEmitter<void>();
+  @Output() flightPinsSelected = new EventEmitter<{
+    origin: { lat: number; lon: number };
+    destination: { lat: number; lon: number };
+  }>();
 
   public map!: L.Map;
   private countries = countries;
@@ -37,6 +41,8 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   private flightPath?: L.Polyline;
   private planeMarker?: L.Marker;
   private planeInterval: any = null;
+  private flightSelectMarkers: L.Marker[] = [];
+  private flightSelectPoints: { lat: number; lon: number }[] = [];
   private initialView = { lat: 20, lon: 0, zoom: 2 };
   public markerVisibility: Record<MarkerType, boolean> = {
     user: true,
@@ -119,12 +125,18 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   
   
     this.map.on('click', (e: L.LeafletMouseEvent) => {
-      this.addMarker(e.latlng.lat, e.latlng.lng, 'user');
-      this.getLocationDetails(e.latlng.lat, e.latlng.lng);
+      if (this.toolbarMode === 'flight') {
+        this.addFlightPoint(e.latlng.lat, e.latlng.lng);
+      } else {
+        this.addMarker(e.latlng.lat, e.latlng.lng, 'user');
+        this.getLocationDetails(e.latlng.lat, e.latlng.lng);
+      }
     });
-  
+
     this.map.on('contextmenu', (e: L.LeafletMouseEvent) => {
-      this.getWishlistLocationDetails(e.latlng.lat, e.latlng.lng);
+      if (this.toolbarMode === 'map') {
+        this.getWishlistLocationDetails(e.latlng.lat, e.latlng.lng);
+      }
     });
 
     this.aiToolbarComponent.map = this.map;
@@ -397,6 +409,28 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     });
     if (this.markerVisibility['airport']) marker.addTo(this.map);
     return marker;
+  }
+
+  private addFlightPoint(lat: number, lon: number): void {
+    if (this.flightSelectPoints.length >= 2) {
+      this.flightSelectMarkers.forEach(m => this.map.removeLayer(m));
+      this.flightSelectMarkers = [];
+      this.flightSelectPoints = [];
+    }
+
+    const marker = L.marker([lat, lon], {
+      icon: this.getIcon('airport'),
+      interactive: false
+    }).addTo(this.map);
+    this.flightSelectMarkers.push(marker);
+    this.flightSelectPoints.push({ lat, lon });
+
+    if (this.flightSelectPoints.length === 2) {
+      this.flightPinsSelected.emit({
+        origin: this.flightSelectPoints[0],
+        destination: this.flightSelectPoints[1],
+      });
+    }
   }
 
   private createArc(start: [number, number], end: [number, number], heightFactor = 0.2, steps = 100): L.LatLngExpression[] {

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpClientModule } from '@angular/common/http';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, of, firstValueFrom } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -84,23 +84,67 @@ export class FlightSearchComponent {
     this.formErrors[field] = false;
   }
 
-  onTwoPinsSelected(event: { origin: string; destination: string }): void {
-    console.log('EVENT Angekommen:', event);
-    const originReq = this.http.get<{ airports: string[] }>(
-      `http://localhost:5003/search-airport?query=${encodeURIComponent(event.origin)}`
+  async onFlightPinsSelected(event: {
+    origin: { lat: number; lon: number };
+    destination: { lat: number; lon: number };
+  }): Promise<void> {
+    const originReq = this.http.get<{ airports: any[] }>(
+      `http://localhost:5003/nearest-airports?lat=${event.origin.lat}&lon=${event.origin.lon}&n=3`
     );
-    const destReq = this.http.get<{ airports: string[] }>(
-      `http://localhost:5003/search-airport?query=${encodeURIComponent(event.destination)}`
+    const destReq = this.http.get<{ airports: any[] }>(
+      `http://localhost:5003/nearest-airports?lat=${event.destination.lat}&lon=${event.destination.lon}&n=3`
     );
 
-    forkJoin([originReq, destReq]).subscribe(([o, d]) => {
-      this.flightOrigin = o.airports[0] || '';
-      this.flightDestination = d.airports[0] || '';
+    forkJoin([originReq, destReq]).subscribe(async ([o, d]) => {
+      const originCodes = (o.airports || []).map((a: any) => a.code);
+      const destCodes = (d.airports || []).map((a: any) => a.code);
+
       const date = new Date();
       date.setDate(date.getDate() + 7);
       this.flightDate = date.toISOString().split('T')[0];
-      if (this.flightOrigin && this.flightDestination) {
-        this.openFlightSearch();
+
+      let found = false;
+      let bestO = originCodes[0];
+      let bestD = destCodes[0];
+
+      outer: for (const oc of originCodes) {
+        for (const dc of destCodes) {
+          const params = new URLSearchParams({
+            from_airport: oc,
+            to_airport: dc,
+            date: this.flightDate,
+            trip: this.flightTrip,
+            seat: this.flightSeat,
+            adults: this.flightAdults.toString(),
+            children: this.flightChildren.toString(),
+          });
+          try {
+            const res: any = await firstValueFrom(
+              this.http.get(`http://localhost:5003/flight-search?${params.toString()}`)
+            );
+            if (res && res.flights && res.flights.length > 0) {
+              this.flightResults = res;
+              this.flightResultsList = res.flights.sort(
+                (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
+              );
+              found = true;
+              bestO = oc;
+              bestD = dc;
+              break outer;
+            }
+          } catch (err) {
+            // ignore and try next
+          }
+        }
+      }
+
+      this.flightOrigin = bestO || '';
+      this.flightDestination = bestD || '';
+      this.flightError = found ? '' : 'Kein Flug gefunden';
+      this.openFlightSearch();
+      this.flightResultsVisible = true;
+      if (!found) {
+        this.flightResultsList = [];
       }
     });
   }
