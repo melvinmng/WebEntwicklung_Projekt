@@ -109,6 +109,12 @@ export class FlightSearchComponent {
     console.log('openFlightSearch aufgerufen');
     this.flightFormVisible = true;
     this.flightResultsVisible = false;
+    this.bookingVisible = false;
+    this.flightError = '';
+    this.bookingError = '';
+    this.iataSearchError = '';
+    this.flightResults = null;
+    this.flightResultsList = [];
   }
 
   closeFlightSearch(): void {
