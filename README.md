@@ -63,6 +63,12 @@ cd world-app
 npm install
 ```
 
+Unter Umständen werden bei der Paketinstallation Vulnerabilities angezeigt. Sollte dies vorkommen, kann folgender Befehl eingegeben werden, um die Vulnerabilities automatisch zu fixen:
+
+```bash
+npm audit fix
+```
+
 ---
 
 ## Projekt starten & stoppen

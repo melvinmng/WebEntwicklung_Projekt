@@ -88,10 +88,12 @@ export class AiToolbarComponent implements OnInit, OnDestroy {
     marker.on('click', () => {
       this.map.removeLayer(marker);
       this.removedMarkersStack.push({ lat, lon, type, data: { city, country } });
-      this.allMarkers = this.allMarkers.filter(m => m.marker !== marker);
+      const idx = this.allMarkers.findIndex(m => m.marker === marker);
+      if (idx !== -1) this.allMarkers.splice(idx, 1);
 
       if (type === 'user' || type === 'wishlist') {
-        this.selectedLocations = this.selectedLocations.filter(loc => loc.lat !== lat || loc.lon !== lon);
+        const idxSel = this.selectedLocations.findIndex(loc => loc.lat === lat && loc.lon === lon);
+        if (idxSel !== -1) this.selectedLocations.splice(idxSel, 1);
       }
     });
 
@@ -118,13 +120,14 @@ export class AiToolbarComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.allMarkers = this.allMarkers.filter(m => {
+      const remaining = this.allMarkers.filter(m => {
         if (['safe', 'experimental', 'hidden'].includes(m.type)) {
           this.map.removeLayer(m.marker);
           return false;
         }
         return true;
       });
+      this.allMarkers.splice(0, this.allMarkers.length, ...remaining);
 
       for (const rec of recs) {
         if (rec.lat && rec.lon) {
@@ -154,10 +157,10 @@ export class AiToolbarComponent implements OnInit, OnDestroy {
   }
 
   clearLocations(): void {
-    this.selectedLocations = [];
+    this.selectedLocations.splice(0, this.selectedLocations.length);
     this.allMarkers.forEach(m => this.map.removeLayer(m.marker));
-    this.allMarkers = [];
-    this.removedMarkersStack = [];
+    this.allMarkers.splice(0, this.allMarkers.length);
+    this.removedMarkersStack.splice(0, this.removedMarkersStack.length);
     this.recommendations = '';
   }
 
