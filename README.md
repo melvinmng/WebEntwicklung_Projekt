@@ -40,6 +40,19 @@ Stelle sicher, dass die folgenden Werkzeuge auf deinem System installiert sind:
 
 ---
 
+## Klonen des Repositories
+
+Klone dieses Repository mit dem folgenden Befehl auf dein lokales System:
+
+```bash
+git clone https://github.com/melvinmng/WebEntwicklung_Projekt.git
+cd WebEntwicklung_Projekt
+```
+
+**Wichtiger Hinweis:** Alle Befehle für Docker Compose und Kubernetes müssen im **Root-Verzeichnis** des Projekts ausgeführt werden. Falls du dich im `world-app`-Verzeichnis befindest, wechsle mit `cd ..` eine Ebene nach oben.
+
+---
+
 ## Einrichtung
 
 ## Branches
