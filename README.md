@@ -42,6 +42,10 @@ Stelle sicher, dass die folgenden Werkzeuge auf deinem System installiert sind:
 
 ## Einrichtung
 
+## Branches
+
+Bitte beachte, dass nur der `main`-Branch als stabil betrachtet und für Produktionszwecke verwendet werden sollte. Alle anderen Branches dienen der aktiven Entwicklung und können instabilen oder nicht funktionsfähigen Code enthalten.
+
 ### 1. API-Key konfigurieren
 
 Für den vollen Funktionsumfang ist ein API-Schlüssel für **Google Gemini** erforderlich. Der für Supabase benötigte Key ist bereits im Code hinterlegt.
