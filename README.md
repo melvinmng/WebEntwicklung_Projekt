@@ -42,27 +42,17 @@ Stelle sicher, dass die folgenden Werkzeuge auf deinem System installiert sind:
 
 ## Einrichtung
 
-### 1. API-Keys konfigurieren
+### 1. API-Key konfigurieren
 
-Für den vollen Funktionsumfang sind API-Schlüssel für Google Gemini und Supabase erforderlich.
+Für den vollen Funktionsumfang ist ein API-Schlüssel für **Google Gemini** erforderlich. Der für Supabase benötigte Key ist bereits im Code hinterlegt.
 
-Lege für die folgenden Services jeweils eine `.env`-Datei im angegebenen Verzeichnis an:
-
-1.  **Gemini API Key** (benötigt vom API-Service)
+-   **Gemini API Key** (benötigt vom API-Service)
     -   Erstelle die Datei: `world-app/backend/api-service/.env`
     -   Inhalt:
         ```
         GEMINI_API_KEY=DEIN_GOOGLE_AI_STUDIO_KEY
         ```
     -   Den Schlüssel erhältst du im [Google AI Studio](https://aistudio.google.com/app/apikey).
-
-2.  **Supabase API Key** (benötigt vom DB-Service)
-    -   Erstelle die Datei: `world-app/backend/db-service/.env`
-    -   Inhalt:
-        ```
-        SUPABASE_API_KEY=DEIN_SUPABASE_SERVICE_ROLE_KEY
-        ```
-    -   Den `service_role` Key findest du in deinem Supabase-Projekt unter `Project Settings → API`.
 
 ### 2. Node.js Abhängigkeiten installieren
 
@@ -172,4 +162,12 @@ Nachdem du Marker gesetzt hast, kannst du über die AI-Toolbar Empfehlungen gene
 
 Über die **Legende** (unten rechts) können einzelne Marker-Typen gefiltert werden.
 Zusätzliche Buttons (unten links) ermöglichen das Löschen aller Marker, das Wiederherstellen des letzten gelöschten Markers und das Zurücksetzen der Kartenansicht.
+
+---
+
+## Fehlerbehebung
+
+Sollte es zu Anzeigefehlern, Problemen beim Login oder unerwartetem Verhalten im Dashboard kommen, leere bitte den **Cache deines Browsers**.
+
+Veraltete zwischengespeicherte Daten können häufig die Ursache für solche Probleme sein.
 

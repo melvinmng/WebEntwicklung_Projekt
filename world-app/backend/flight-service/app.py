@@ -7,7 +7,6 @@ from fast_flights import (
     get_flights as fetch_flights,
     search_airport,  # not working correctly, using DB instead
 )
-from dotenv import load_dotenv
 import os
 import requests
 
@@ -17,8 +16,6 @@ app = Flask(__name__)
 dashboard.bind(app)
 dashboard.config.init_from(file="config.cfg")
 CORS(app)
-
-load_dotenv()
 
 
 @app.route("/flight-search", methods=["GET"])
@@ -62,10 +59,7 @@ def flights():
         return jsonify({"error": str(e)}), 404
 
 
-SUPABASE_API_KEY = (
-    os.getenv("SUPABASE_API_KEY")
-    or "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
-)  # The second API Key is publicly available and automatically gives you "anon"-rights, which is possible as we are able to create policies in supabase itself. You will only have reading access to the db using this key.
+SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
 SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
 TABLE_NAME = "airports"
 

@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import requests
-from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 import flask_monitoringdashboard as dashboard
@@ -12,8 +11,6 @@ dashboard.bind(app)
 dashboard.config.init_from(file="config.cfg")
 CORS(app)
 
-
-load_dotenv()
 
 SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
 SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
