@@ -44,6 +44,9 @@ export class FlightSearchComponent {
   isLoading = false;
   autoIata = true;
 
+  interactiveMode = false;
+  awaitingPoints = false;
+
   private resolveIata(input: string) {
     if (!input) return of('');
 
@@ -88,6 +91,8 @@ export class FlightSearchComponent {
     origin: { lat: number; lon: number };
     destination: { lat: number; lon: number };
   }): Promise<void> {
+    if (!this.awaitingPoints) return;
+
     const originReq = this.http.get<{ airports: any[] }>(
       `http://localhost:5003/nearest-airports?lat=${event.origin.lat}&lon=${event.origin.lon}&n=3`
     );
@@ -96,16 +101,19 @@ export class FlightSearchComponent {
     );
 
     forkJoin([originReq, destReq]).subscribe(async ([o, d]) => {
-      const originCodes = (o.airports || []).map((a: any) => a.code);
-      const destCodes = (d.airports || []).map((a: any) => a.code);
+      const originAirports = o.airports || [];
+      const destAirports = d.airports || [];
+
+      const originCodes = originAirports.map((a: any) => a.code);
+      const destCodes = destAirports.map((a: any) => a.code);
 
       const date = new Date();
       date.setDate(date.getDate() + 7);
       this.flightDate = date.toISOString().split('T')[0];
 
       let found = false;
-      let bestO = originCodes[0];
-      let bestD = destCodes[0];
+      let bestO = originAirports[0];
+      let bestD = destAirports[0];
 
       outer: for (const oc of originCodes) {
         for (const dc of destCodes) {
@@ -128,8 +136,8 @@ export class FlightSearchComponent {
                 (a: any, b: any) => (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
               );
               found = true;
-              bestO = oc;
-              bestD = dc;
+              bestO = originAirports.find((a: any) => a.code === oc) || originAirports[0];
+              bestD = destAirports.find((a: any) => a.code === dc) || destAirports[0];
               break outer;
             }
           } catch (err) {
@@ -138,11 +146,26 @@ export class FlightSearchComponent {
         }
       }
 
-      this.flightOrigin = bestO || '';
-      this.flightDestination = bestD || '';
+      this.flightOrigin = bestO?.code || '';
+      this.flightDestination = bestD?.code || '';
       this.flightError = found ? '' : 'Kein Flug gefunden';
-      this.openFlightSearch();
+      this.flightFormVisible = true;
       this.flightResultsVisible = true;
+      this.awaitingPoints = false;
+      this.interactiveMode = false;
+
+      if (bestO && bestD) {
+        this.mapComponent.showFlightSelection(
+          event.origin,
+          { lat: bestO.lat, lon: bestO.lon },
+          event.destination,
+          { lat: bestD.lat, lon: bestD.lon }
+        );
+        this.mapComponent.map.fitBounds([
+          [event.origin.lat, event.origin.lon],
+          [event.destination.lat, event.destination.lon],
+        ]);
+      }
       if (!found) {
         this.flightResultsList = [];
       }
@@ -150,7 +173,6 @@ export class FlightSearchComponent {
   }
 
   openFlightSearch(): void {
-    console.log('openFlightSearch aufgerufen');
     this.flightFormVisible = true;
     this.flightResultsVisible = false;
   }
@@ -159,6 +181,25 @@ export class FlightSearchComponent {
     this.resetFlightSearch();
     this.flightFormVisible = false;
     this.flightResultsVisible = false;
+  }
+
+  startInteractiveMode(): void {
+    this.resetFlightSearch();
+    this.interactiveMode = true;
+    this.flightFormVisible = true;
+    this.flightResultsVisible = false;
+  }
+
+  beginPointSelection(): void {
+    this.flightFormVisible = false;
+    this.flightResultsVisible = false;
+    this.awaitingPoints = true;
+  }
+
+  cancelInteractiveMode(): void {
+    this.interactiveMode = false;
+    this.awaitingPoints = false;
+    this.closeFlightSearch();
   }
 
   resetFlightSearch(): void {

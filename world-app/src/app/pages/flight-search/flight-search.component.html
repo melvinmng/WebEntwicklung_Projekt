@@ -2,25 +2,28 @@
     <app-map [toolbarMode]="'flight'"
              (flightSearchRequested)="openFlightSearch()"
              (flightPinsSelected)="onFlightPinsSelected($event)"></app-map>
+    <button class="interactive-button" (click)="startInteractiveMode()">Interaktive Suche</button>
 
     <!-- Flug-Suchformular -->
     <div class="flight-search-overlay" *ngIf="flightFormVisible" (click)="closeFlightSearch()">
         <div class="flight-popup-container" (click)="$event.stopPropagation()">
             <div class="flight-search-box">
             <h3>Flugsuche</h3>
-            <form (ngSubmit)="searchFlights()">
+            <form (ngSubmit)="interactiveMode ? beginPointSelection() : searchFlights()">
+            <div *ngIf="!interactiveMode">
             <label>Von
                 <input [(ngModel)]="flightOrigin" name="origin" required
                        (ngModelChange)="clearError('origin')"
-                       [ngClass]="{ 'input-error': formErrors.origin }" 
+                       [ngClass]="{ 'input-error': formErrors.origin }"
                        placeholder="IATA-Code eintragen (z.B. FRA)"/>
             </label>
             <label>Nach
                 <input [(ngModel)]="flightDestination" name="destination" required
                        (ngModelChange)="clearError('destination')"
-                       [ngClass]="{ 'input-error': formErrors.destination }" 
+                       [ngClass]="{ 'input-error': formErrors.destination }"
                        placeholder="IATA-Code eintragen (z.B. JFK)"/>
             </label>
+            </div>
             <label>Datum
                 <input type="date" [(ngModel)]="flightDate" name="date" required
                        (ngModelChange)="clearError('date')"
@@ -45,6 +48,7 @@
             <label>Kinder
                 <input type="number" [(ngModel)]="flightChildren" name="children" min="0" />
             </label>
+            <div *ngIf="!interactiveMode">
             <label>
                 <input type="checkbox" [(ngModel)]="autoIata" name="autoIata" /> Automatische IATA-Suche
             </label>
@@ -53,15 +57,17 @@
                 placeholder="z. B. Stuttgart"/>
             </label>
             <button type="button" (click)="findAirportCode(airportNameSearch)">IATA-Code suchen</button>
+            </div>
             <div *ngIf="foundIataCodes.length">Gefundene Codes: {{ foundIataCodes.join(', ') }}</div>
             <div *ngIf="iataSearchError" class="flight-error">{{ iataSearchError }}</div>
             <div *ngIf="bookingError" class="flight-error">{{ bookingError }}</div>
             <button type="submit" [disabled]="isLoading">
-                Suchen
+                {{ interactiveMode ? 'Punkte wählen' : 'Suchen' }}
                 <span *ngIf="isLoading" class="loading-spinner"></span>
             </button>
-            <button type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
+            <button *ngIf="!interactiveMode" type="button" (click)="openBookingPage()">Direkt zur Buchungsseite</button>
             <button type="button" (click)="resetFlightSearch()">Zurücksetzen</button>
+            <button *ngIf="interactiveMode" type="button" (click)="cancelInteractiveMode()">Abbrechen</button>
             <button type="close" (click)="closeFlightSearch()">Schließen</button>
             </form>
             </div>

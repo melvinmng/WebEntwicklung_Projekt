@@ -43,6 +43,7 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   private planeInterval: any = null;
   private flightSelectMarkers: L.Marker[] = [];
   private flightSelectPoints: { lat: number; lon: number }[] = [];
+  private flightConnectorLines: L.Polyline[] = [];
   private initialView = { lat: 20, lon: 0, zoom: 2 };
   public markerVisibility: Record<MarkerType, boolean> = {
     user: true,
@@ -388,6 +389,11 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
   clearFlightVisualization(): void {
     this.flightMarkers.forEach(m => this.map.removeLayer(m));
     this.flightMarkers = [];
+    this.flightSelectMarkers.forEach(m => this.map.removeLayer(m));
+    this.flightSelectMarkers = [];
+    this.flightSelectPoints = [];
+    this.flightConnectorLines.forEach(l => this.map.removeLayer(l));
+    this.flightConnectorLines = [];
     if (this.flightPath) {
       this.map.removeLayer(this.flightPath);
       this.flightPath = undefined;
@@ -486,6 +492,48 @@ export class MapComponent implements AfterViewInit, OnInit, OnDestroy {
     const m2 = this.createAirportMarker(dest.lat, dest.lon);
     this.flightMarkers = [m1, m2];
     const arc = this.createArc([origin.lat, origin.lon], [dest.lat, dest.lon]);
+    this.flightPath = L.polyline(arc, { color: 'orange', weight: 2 });
+    if (this.markerVisibility['airport']) this.flightPath.addTo(this.map);
+    this.animatePlane(arc);
+  }
+
+  showFlightSelection(
+    originPoint: { lat: number; lon: number },
+    originAirport: { lat: number; lon: number },
+    destPoint: { lat: number; lon: number },
+    destAirport: { lat: number; lon: number }
+  ): void {
+    this.clearFlightVisualization();
+    this.hideAllMarkers();
+
+    const line1 = L.polyline(
+      [
+        [originPoint.lat, originPoint.lon],
+        [originAirport.lat, originAirport.lon],
+      ],
+      { color: 'gray', weight: 1, dashArray: '4' }
+    );
+    const line2 = L.polyline(
+      [
+        [destPoint.lat, destPoint.lon],
+        [destAirport.lat, destAirport.lon],
+      ],
+      { color: 'gray', weight: 1, dashArray: '4' }
+    );
+    if (this.markerVisibility['airport']) {
+      line1.addTo(this.map);
+      line2.addTo(this.map);
+    }
+    this.flightConnectorLines = [line1, line2];
+
+    const m1 = this.createAirportMarker(originAirport.lat, originAirport.lon);
+    const m2 = this.createAirportMarker(destAirport.lat, destAirport.lon);
+    this.flightMarkers = [m1, m2];
+
+    const arc = this.createArc(
+      [originAirport.lat, originAirport.lon],
+      [destAirport.lat, destAirport.lon]
+    );
     this.flightPath = L.polyline(arc, { color: 'orange', weight: 2 });
     if (this.markerVisibility['airport']) this.flightPath.addTo(this.map);
     this.animatePlane(arc);

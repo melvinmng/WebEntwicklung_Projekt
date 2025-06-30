@@ -10,6 +10,25 @@ app-map {
   height: 100%;
 }
 
+.interactive-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: var(--blue4);
+  color: var(--white);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.interactive-button:hover {
+  background: var(--blue3);
+}
+
 .dropdown-container {
   position: relative;
   display: inline-block;

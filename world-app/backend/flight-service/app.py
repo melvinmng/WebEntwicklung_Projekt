@@ -187,7 +187,15 @@ def nearest_airports():
     results = []
     for a in airports:
         dist = haversine(lat, lon, a["lat"], a["lon"])
-        results.append({"code": a["code"], "name": a["name"], "distance_km": dist})
+        results.append(
+            {
+                "code": a["code"],
+                "name": a["name"],
+                "lat": a["lat"],
+                "lon": a["lon"],
+                "distance_km": dist,
+            }
+        )
 
     results.sort(key=lambda x: x["distance_km"])
     return jsonify({"airports": results[:n]})
