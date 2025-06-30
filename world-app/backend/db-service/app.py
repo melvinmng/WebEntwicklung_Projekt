@@ -16,7 +16,7 @@ CORS(app)
 load_dotenv()
 
 SUPABASE_URL = "https://htcbliihfzdqjczueixg.supabase.co"
-SUPABASE_API_KEY = os.getenv("SUPABASE_API_KEY")
+SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh0Y2JsaWloZnpkcWpjenVlaXhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3MTg5ODMsImV4cCI6MjA2NTI5NDk4M30.R7VSTu5KcVVdvR4ZqMMJVPtTxmN-85g3hgHRwWGZZvw"
 TABLE_NAME = "user-data"
 
 
