@@ -1,6 +1,5 @@
 <div class="aiToolbar" [class.visible]="aiToolbarVisible" (mouseenter)="showAiToolbar()" (mouseleave)="startAiToolbarFadeTimer()">
     <div class="aiToolbar-group">
-      <!-- Empfehlungsbutton mit integriertem Dropdown-Pfeil -->
       <div class="recommendation-button-wrapper">
         <button (click)="onMainAction()" [disabled]="isLoading">
           <span>{{ mode === 'map' ? 'Empfehlungen generieren' : 'Flüge suchen' }}</span>
